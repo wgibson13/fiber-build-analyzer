@@ -1,4 +1,3 @@
-import React from 'react';
 import type { UiInputs } from '../App';
 import { fmtCurrency, fmtPct } from '../lib/format';
 

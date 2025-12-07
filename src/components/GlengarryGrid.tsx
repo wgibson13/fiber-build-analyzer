@@ -1,4 +1,3 @@
-import React from 'react';
 import { computeIrr, type IrrInputs } from '../lib/irrModel';
 import { fmtCurrency, fmtPct } from '../lib/format';
 
