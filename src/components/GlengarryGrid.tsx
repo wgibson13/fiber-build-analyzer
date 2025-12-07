@@ -5,9 +5,10 @@ type BaseInputs = Omit<IrrInputs, 'costPerPassing' | 'steadyStatePenetration'>;
 
 interface GlengarryGridProps {
   baseInputs: BaseInputs;
+  minimumIrr: number;
 }
 
-function GlengarryGrid({ baseInputs }: GlengarryGridProps) {
+function GlengarryGrid({ baseInputs, minimumIrr }: GlengarryGridProps) {
   const costs = [
     300, 400, 500, 600, 700, 800, 900, 1000,
     1100, 1200, 1300, 1400, 1500, 1600, 1700, 1800,
@@ -24,10 +25,13 @@ function GlengarryGrid({ baseInputs }: GlengarryGridProps) {
     if (irr === null) {
       return 'bg-gray-300 text-gray-600';
     }
-    if (irr >= 0.15) {
+    // Calculate borderline threshold (5% below minimum)
+    const borderlineThreshold = Math.max(0, minimumIrr - 0.05);
+    
+    if (irr >= minimumIrr) {
       return 'bg-green-500 text-white font-semibold';
     }
-    if (irr >= 0.1) {
+    if (irr >= borderlineThreshold) {
       return 'bg-blue-500 text-white';
     }
     return 'bg-red-500 text-white';
@@ -106,19 +110,19 @@ function GlengarryGrid({ baseInputs }: GlengarryGridProps) {
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-green-500 rounded"></div>
           <span className="text-gray-700">
-            <span className="font-semibold">Green:</span> ≥ 15% IRR (A / Glengarry)
+            <span className="font-semibold">Green:</span> ≥ {fmtPct(minimumIrr)} IRR (A / Glengarry)
           </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-blue-500 rounded"></div>
           <span className="text-gray-700">
-            <span className="font-semibold">Blue:</span> 10–15% IRR (Borderline)
+            <span className="font-semibold">Blue:</span> {fmtPct(Math.max(0, minimumIrr - 0.05))}–{fmtPct(minimumIrr)} IRR (Borderline)
           </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-red-500 rounded"></div>
           <span className="text-gray-700">
-            <span className="font-semibold">Red:</span> &lt; 10% IRR (Avoid)
+            <span className="font-semibold">Red:</span> &lt; {fmtPct(Math.max(0, minimumIrr - 0.05))} IRR (Avoid)
           </span>
         </div>
       </div>

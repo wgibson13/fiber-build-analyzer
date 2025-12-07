@@ -12,6 +12,8 @@ export interface UiInputs extends BaseInputs {
 
   churnInstallLabor: number;     // e.g. 100
   churnCpeCost: number;          // e.g. 200
+  
+  minimumIrr: number;            // Minimum IRR threshold (decimal, e.g. 0.15 for 15%)
 }
 
 const defaultInputs: UiInputs = {
@@ -29,6 +31,7 @@ const defaultInputs: UiInputs = {
   newCpeCost: 200,
   churnInstallLabor: 150,
   churnCpeCost: 50,
+  minimumIrr: 0.15,
 };
 
 function App() {
@@ -65,7 +68,7 @@ function App() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <InputsPanel value={uiInputs} onChange={setUiInputs} />
           <div className="lg:col-span-2">
-            <GlengarryGrid baseInputs={baseInputs} />
+            <GlengarryGrid baseInputs={baseInputs} minimumIrr={uiInputs.minimumIrr} />
           </div>
         </div>
       </div>

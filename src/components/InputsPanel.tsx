@@ -32,6 +32,9 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
   // Ramp Year 2 Factor options: 0.2, 0.4, 0.6, 0.7, 0.8, 0.9
   const rampYear2FactorOptions = [0.2, 0.4, 0.6, 0.7, 0.8, 0.9];
 
+  // Minimum IRR options: 0.05, 0.06, ... 0.30 (5% to 30% in 1% increments)
+  const minimumIrrOptions = Array.from({ length: 26 }, (_, i) => (i + 5) * 0.01);
+
   // Drop Construction options: 0, 50, 100, ... 2000 (increments of 50)
   const dropConstructionOptions = Array.from({ length: 41 }, (_, i) => i * 50);
 
@@ -156,6 +159,27 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Minimum IRR */}
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+                Minimum IRR %
+              </label>
+              <select
+                value={value.minimumIrr}
+                onChange={(e) => handleChange('minimumIrr', parseFloat(e.target.value))}
+                className={inputBaseClasses}
+              >
+                {minimumIrrOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {fmtPct(opt)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <p className="text-xs text-gray-500 ml-auto text-right w-32">Threshold for green cells</p>
           </div>
 
           {/* Ramp Year 1 Factor */}
