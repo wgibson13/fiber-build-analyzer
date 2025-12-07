@@ -11,13 +11,6 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
     onChange({ ...value, [field]: newValue });
   };
 
-  const handleCurrencyChange = (field: keyof UiInputs, inputValue: string) => {
-    // Remove currency symbols, commas, and spaces, then parse
-    const cleaned = inputValue.replace(/[$, ]/g, '');
-    const numValue = parseFloat(cleaned) || 0;
-    handleChange(field, numValue);
-  };
-
   // Generate ARPU options: 10, 15, 20, ... 100
   const arpuOptions = Array.from({ length: 19 }, (_, i) => (i + 2) * 5);
 
@@ -38,6 +31,18 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
 
   // Ramp Year 2 Factor options: 0.2, 0.4, 0.6, 0.7, 0.8, 0.9
   const rampYear2FactorOptions = [0.2, 0.4, 0.6, 0.7, 0.8, 0.9];
+
+  // Drop Construction options: 0, 50, 100, ... 2000 (increments of 50)
+  const dropConstructionOptions = Array.from({ length: 41 }, (_, i) => i * 50);
+
+  // Install Labor options: 0, 25, 50, ... 500 (increments of 25)
+  const installLaborOptions = Array.from({ length: 21 }, (_, i) => i * 25);
+
+  // CPE Cost options: 0, 25, 50, ... 500 (increments of 25)
+  const cpeCostOptions = Array.from({ length: 21 }, (_, i) => i * 25);
+
+  // Reinstall Labor options: 0, 25, 50, ... 500 (increments of 25)
+  const reinstallLaborOptions = Array.from({ length: 21 }, (_, i) => i * 25);
 
   const inputBaseClasses = "w-32 px-3 py-2 text-right font-mono border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
   const readOnlyClasses = "w-32 px-3 py-2 text-right font-mono bg-gray-50 border border-gray-300 rounded-md text-gray-700";
@@ -206,19 +211,17 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
               <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
                 Drop Construction ($)
               </label>
-              <input
-                type="text"
-                value={fmtCurrency(value.newDropConstruction)}
-                onChange={(e) => handleCurrencyChange('newDropConstruction', e.target.value)}
-                onBlur={(e) => {
-                  // Ensure it's formatted on blur
-                  const cleaned = e.target.value.replace(/[$, ]/g, '');
-                  const numValue = parseFloat(cleaned) || 0;
-                  e.target.value = fmtCurrency(numValue);
-                }}
+              <select
+                value={value.newDropConstruction}
+                onChange={(e) => handleChange('newDropConstruction', parseFloat(e.target.value))}
                 className={inputBaseClasses}
-                placeholder="$0"
-              />
+              >
+                {dropConstructionOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {fmtCurrency(opt)}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           <div>
@@ -226,18 +229,17 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
               <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
                 Install Labor ($)
               </label>
-              <input
-                type="text"
-                value={fmtCurrency(value.newInstallLabor)}
-                onChange={(e) => handleCurrencyChange('newInstallLabor', e.target.value)}
-                onBlur={(e) => {
-                  const cleaned = e.target.value.replace(/[$, ]/g, '');
-                  const numValue = parseFloat(cleaned) || 0;
-                  e.target.value = fmtCurrency(numValue);
-                }}
+              <select
+                value={value.newInstallLabor}
+                onChange={(e) => handleChange('newInstallLabor', parseFloat(e.target.value))}
                 className={inputBaseClasses}
-                placeholder="$0"
-              />
+              >
+                {installLaborOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {fmtCurrency(opt)}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           <div>
@@ -245,18 +247,17 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
               <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
                 CPE / Equipment ($)
               </label>
-              <input
-                type="text"
-                value={fmtCurrency(value.newCpeCost)}
-                onChange={(e) => handleCurrencyChange('newCpeCost', e.target.value)}
-                onBlur={(e) => {
-                  const cleaned = e.target.value.replace(/[$, ]/g, '');
-                  const numValue = parseFloat(cleaned) || 0;
-                  e.target.value = fmtCurrency(numValue);
-                }}
+              <select
+                value={value.newCpeCost}
+                onChange={(e) => handleChange('newCpeCost', parseFloat(e.target.value))}
                 className={inputBaseClasses}
-                placeholder="$0"
-              />
+              >
+                {cpeCostOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {fmtCurrency(opt)}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           {/* Read-only total */}
@@ -282,18 +283,17 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
               <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
                 Reinstall Labor ($)
               </label>
-              <input
-                type="text"
-                value={fmtCurrency(value.churnInstallLabor)}
-                onChange={(e) => handleCurrencyChange('churnInstallLabor', e.target.value)}
-                onBlur={(e) => {
-                  const cleaned = e.target.value.replace(/[$, ]/g, '');
-                  const numValue = parseFloat(cleaned) || 0;
-                  e.target.value = fmtCurrency(numValue);
-                }}
+              <select
+                value={value.churnInstallLabor}
+                onChange={(e) => handleChange('churnInstallLabor', parseFloat(e.target.value))}
                 className={inputBaseClasses}
-                placeholder="$0"
-              />
+              >
+                {reinstallLaborOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {fmtCurrency(opt)}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           <div>
@@ -301,18 +301,17 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
               <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
                 CPE / Equipment ($)
               </label>
-              <input
-                type="text"
-                value={fmtCurrency(value.churnCpeCost)}
-                onChange={(e) => handleCurrencyChange('churnCpeCost', e.target.value)}
-                onBlur={(e) => {
-                  const cleaned = e.target.value.replace(/[$, ]/g, '');
-                  const numValue = parseFloat(cleaned) || 0;
-                  e.target.value = fmtCurrency(numValue);
-                }}
+              <select
+                value={value.churnCpeCost}
+                onChange={(e) => handleChange('churnCpeCost', parseFloat(e.target.value))}
                 className={inputBaseClasses}
-                placeholder="$0"
-              />
+              >
+                {cpeCostOptions.map((opt) => (
+                  <option key={opt} value={opt}>
+                    {fmtCurrency(opt)}
+                  </option>
+                ))}
+              </select>
             </div>
           </div>
           {/* Read-only total */}
