@@ -299,7 +299,7 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
           <div>
             <div className="flex items-center justify-between mb-1">
               <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
-                CPE / Equipment ($)
+                Redeploy CPE ($)
               </label>
               <select
                 value={value.churnCpeCost}
