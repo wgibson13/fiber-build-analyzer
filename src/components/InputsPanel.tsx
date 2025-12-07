@@ -11,6 +11,13 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
     onChange({ ...value, [field]: newValue });
   };
 
+  const handleCurrencyChange = (field: keyof UiInputs, inputValue: string) => {
+    // Remove currency symbols, commas, and spaces, then parse
+    const cleaned = inputValue.replace(/[$, ]/g, '');
+    const numValue = parseFloat(cleaned) || 0;
+    handleChange(field, numValue);
+  };
+
   // Generate ARPU options: 10, 15, 20, ... 100
   const arpuOptions = Array.from({ length: 19 }, (_, i) => (i + 2) * 5);
 
@@ -200,10 +207,15 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
                 Drop Construction ($)
               </label>
               <input
-                type="number"
-                step="any"
-                value={value.newDropConstruction}
-                onChange={(e) => handleChange('newDropConstruction', parseFloat(e.target.value) || 0)}
+                type="text"
+                value={fmtCurrency(value.newDropConstruction)}
+                onChange={(e) => handleCurrencyChange('newDropConstruction', e.target.value)}
+                onBlur={(e) => {
+                  // Ensure it's formatted on blur
+                  const cleaned = e.target.value.replace(/[$, ]/g, '');
+                  const numValue = parseFloat(cleaned) || 0;
+                  e.target.value = fmtCurrency(numValue);
+                }}
                 className={inputBaseClasses}
                 placeholder="$0"
               />
@@ -215,10 +227,14 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
                 Install Labor ($)
               </label>
               <input
-                type="number"
-                step="any"
-                value={value.newInstallLabor}
-                onChange={(e) => handleChange('newInstallLabor', parseFloat(e.target.value) || 0)}
+                type="text"
+                value={fmtCurrency(value.newInstallLabor)}
+                onChange={(e) => handleCurrencyChange('newInstallLabor', e.target.value)}
+                onBlur={(e) => {
+                  const cleaned = e.target.value.replace(/[$, ]/g, '');
+                  const numValue = parseFloat(cleaned) || 0;
+                  e.target.value = fmtCurrency(numValue);
+                }}
                 className={inputBaseClasses}
                 placeholder="$0"
               />
@@ -230,10 +246,14 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
                 CPE / Equipment ($)
               </label>
               <input
-                type="number"
-                step="any"
-                value={value.newCpeCost}
-                onChange={(e) => handleChange('newCpeCost', parseFloat(e.target.value) || 0)}
+                type="text"
+                value={fmtCurrency(value.newCpeCost)}
+                onChange={(e) => handleCurrencyChange('newCpeCost', e.target.value)}
+                onBlur={(e) => {
+                  const cleaned = e.target.value.replace(/[$, ]/g, '');
+                  const numValue = parseFloat(cleaned) || 0;
+                  e.target.value = fmtCurrency(numValue);
+                }}
                 className={inputBaseClasses}
                 placeholder="$0"
               />
@@ -263,10 +283,14 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
                 Reinstall Labor ($)
               </label>
               <input
-                type="number"
-                step="any"
-                value={value.churnInstallLabor}
-                onChange={(e) => handleChange('churnInstallLabor', parseFloat(e.target.value) || 0)}
+                type="text"
+                value={fmtCurrency(value.churnInstallLabor)}
+                onChange={(e) => handleCurrencyChange('churnInstallLabor', e.target.value)}
+                onBlur={(e) => {
+                  const cleaned = e.target.value.replace(/[$, ]/g, '');
+                  const numValue = parseFloat(cleaned) || 0;
+                  e.target.value = fmtCurrency(numValue);
+                }}
                 className={inputBaseClasses}
                 placeholder="$0"
               />
@@ -278,10 +302,14 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
                 CPE / Equipment ($)
               </label>
               <input
-                type="number"
-                step="any"
-                value={value.churnCpeCost}
-                onChange={(e) => handleChange('churnCpeCost', parseFloat(e.target.value) || 0)}
+                type="text"
+                value={fmtCurrency(value.churnCpeCost)}
+                onChange={(e) => handleCurrencyChange('churnCpeCost', e.target.value)}
+                onBlur={(e) => {
+                  const cleaned = e.target.value.replace(/[$, ]/g, '');
+                  const numValue = parseFloat(cleaned) || 0;
+                  e.target.value = fmtCurrency(numValue);
+                }}
                 className={inputBaseClasses}
                 placeholder="$0"
               />
