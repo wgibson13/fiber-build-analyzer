@@ -179,7 +179,7 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
                 ))}
               </select>
             </div>
-            <p className="text-xs text-gray-500 ml-auto text-right w-32">Threshold for green cells</p>
+            <p className="text-xs text-gray-500 ml-auto text-right w-32">Minimum approval threshold</p>
           </div>
 
           {/* Ramp Year 1 Factor */}

@@ -25,16 +25,19 @@ function GlengarryGrid({ baseInputs, minimumIrr }: GlengarryGridProps) {
     if (irr === null) {
       return 'bg-gray-300 text-gray-600';
     }
-    // Calculate borderline threshold (5% below minimum)
-    const borderlineThreshold = Math.max(0, minimumIrr - 0.05);
+    // Calculate borderline threshold (5% above minimum for blue zone)
+    const borderlineThreshold = minimumIrr + 0.05;
     
-    if (irr >= minimumIrr) {
-      return 'bg-green-500 text-white font-semibold';
+    if (irr < minimumIrr) {
+      // Below minimum - do not approve
+      return 'bg-red-500 text-white';
     }
-    if (irr >= borderlineThreshold) {
+    if (irr < borderlineThreshold) {
+      // At or just above minimum - borderline
       return 'bg-blue-500 text-white';
     }
-    return 'bg-red-500 text-white';
+    // Well above minimum - approve
+    return 'bg-green-500 text-white font-semibold';
   };
 
   const formatIrr = (irr: number | null): string => {
@@ -110,19 +113,19 @@ function GlengarryGrid({ baseInputs, minimumIrr }: GlengarryGridProps) {
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-green-500 rounded"></div>
           <span className="text-gray-700">
-            <span className="font-semibold">Green:</span> ≥ {fmtPct(minimumIrr)} IRR (A / Glengarry)
+            <span className="font-semibold">Green:</span> ≥ {fmtPct(minimumIrr + 0.05)} IRR (A / Glengarry)
           </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-blue-500 rounded"></div>
           <span className="text-gray-700">
-            <span className="font-semibold">Blue:</span> {fmtPct(Math.max(0, minimumIrr - 0.05))}–{fmtPct(minimumIrr)} IRR (Borderline)
+            <span className="font-semibold">Blue:</span> {fmtPct(minimumIrr)}–{fmtPct(minimumIrr + 0.05)} IRR (Borderline)
           </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-red-500 rounded"></div>
           <span className="text-gray-700">
-            <span className="font-semibold">Red:</span> &lt; {fmtPct(Math.max(0, minimumIrr - 0.05))} IRR (Avoid)
+            <span className="font-semibold">Red:</span> &lt; {fmtPct(minimumIrr)} IRR (Do Not Approve)
           </span>
         </div>
       </div>
