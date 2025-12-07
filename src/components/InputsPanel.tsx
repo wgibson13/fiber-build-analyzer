@@ -47,23 +47,23 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
   // Reinstall Labor options: 0, 25, 50, ... 500 (increments of 25)
   const reinstallLaborOptions = Array.from({ length: 21 }, (_, i) => i * 25);
 
-  const inputBaseClasses = "w-32 px-3 py-2 text-right font-mono border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent";
-  const readOnlyClasses = "w-32 px-3 py-2 text-right font-mono bg-gray-50 border border-gray-300 rounded-md text-gray-700";
+  const inputBaseClasses = "w-full sm:w-32 px-3 py-2 text-right font-mono border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base";
+  const readOnlyClasses = "w-full sm:w-32 px-3 py-2 text-right font-mono bg-gray-50 border border-gray-300 rounded-md text-gray-700 text-sm sm:text-base";
 
   // Calculate totals
   const totalNewInstallCost = value.newDropConstruction + value.newInstallLabor + value.newCpeCost;
   const totalReinstallCost = value.churnInstallLabor + value.churnCpeCost;
 
   return (
-    <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6 space-y-6">
+    <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 sm:p-6 space-y-4 sm:space-y-6">
       {/* Assumptions: Economics */}
       <div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-4">Assumptions</h2>
-        <div className="space-y-5">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-3 sm:mb-4">Assumptions</h2>
+        <div className="space-y-3 sm:space-y-5">
           {/* ARPU */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 ARPU ($/month)
               </label>
               <select
@@ -83,7 +83,7 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
           {/* Gross Margin */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Gross Margin
               </label>
               <select
@@ -98,13 +98,13 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
                 ))}
               </select>
             </div>
-            <p className="text-xs text-gray-500 ml-auto text-right w-32">EBITDA margin</p>
+            <p className="text-xs text-gray-500 ml-auto text-right w-full sm:w-32">EBITDA margin</p>
           </div>
 
           {/* Churn Rate */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Churn Rate
               </label>
               <select
@@ -124,7 +124,7 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
           {/* Exit Multiple */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Exit Multiple
               </label>
               <select
@@ -144,7 +144,7 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
           {/* Horizon Years */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Horizon Years
               </label>
               <select
@@ -164,7 +164,7 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
           {/* Minimum IRR */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Minimum IRR %
               </label>
               <select
@@ -179,13 +179,13 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
                 ))}
               </select>
             </div>
-            <p className="text-xs text-gray-500 ml-auto text-right w-32">Minimum approval threshold</p>
+            <p className="text-xs text-gray-500 ml-auto text-right w-full sm:w-32">Minimum approval threshold</p>
           </div>
 
           {/* Ramp Year 1 Factor */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Ramp Year 1 Factor
               </label>
               <select
@@ -200,13 +200,13 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
                 ))}
               </select>
             </div>
-            <p className="text-xs text-gray-500 ml-auto text-right w-32">Used in ramp to stabilization</p>
+            <p className="text-xs text-gray-500 ml-auto text-right w-full sm:w-32">Used in ramp to stabilization</p>
           </div>
 
           {/* Ramp Year 2 Factor */}
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Ramp Year 2 Factor
               </label>
               <select
@@ -221,18 +221,18 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
                 ))}
               </select>
             </div>
-            <p className="text-xs text-gray-500 ml-auto text-right w-32">Used in ramp to stabilization</p>
+            <p className="text-xs text-gray-500 ml-auto text-right w-full sm:w-32">Used in ramp to stabilization</p>
           </div>
         </div>
       </div>
 
       {/* New Install Cost Breakdown */}
-      <div className="pt-4 border-t border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">New Install Cost Breakdown</h3>
+      <div className="pt-3 sm:pt-4 border-t border-gray-200">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">New Install Cost Breakdown</h3>
         <div className="space-y-3">
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Drop Construction ($)
               </label>
               <select
@@ -250,7 +250,7 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
           </div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Install Labor ($)
               </label>
               <select
@@ -268,7 +268,7 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
           </div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 CPE / Equipment ($)
               </label>
               <select
@@ -287,7 +287,7 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
           {/* Read-only total */}
           <div className="pt-2 border-t border-gray-200">
             <div className="flex items-center justify-between">
-              <label className="text-base font-semibold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-semibold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Total New Install Cost per Sub ($)
               </label>
               <div className={readOnlyClasses}>
@@ -299,12 +299,12 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
       </div>
 
       {/* Churn Reinstall Cost Breakdown */}
-      <div className="pt-4 border-t border-gray-200">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">Churn Reinstall Cost Breakdown</h3>
+      <div className="pt-3 sm:pt-4 border-t border-gray-200">
+        <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-3 sm:mb-4">Churn Reinstall Cost Breakdown</h3>
         <div className="space-y-3">
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Reinstall Labor ($)
               </label>
               <select
@@ -322,7 +322,7 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
           </div>
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="text-base font-bold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-bold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Redeploy CPE ($)
               </label>
               <select
@@ -341,7 +341,7 @@ function InputsPanel({ value, onChange }: InputsPanelProps) {
           {/* Read-only total */}
           <div className="pt-2 border-t border-gray-200">
             <div className="flex items-center justify-between">
-              <label className="text-base font-semibold text-gray-700 flex-shrink-0 mr-4">
+              <label className="text-sm sm:text-base font-semibold text-gray-700 flex-shrink-0 mr-2 sm:mr-4">
                 Total Reinstall Cost per Churn ($)
               </label>
               <div className={readOnlyClasses}>

@@ -55,17 +55,17 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="w-full mx-auto p-6 space-y-6">
+      <div className="w-full mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
             Fiber Build IRR Analyzer
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm sm:text-base text-gray-600">
             Evaluate fiber build economics by cost and penetration.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
           <InputsPanel value={uiInputs} onChange={setUiInputs} />
           <div className="lg:col-span-2">
             <GlengarryGrid baseInputs={baseInputs} minimumIrr={uiInputs.minimumIrr} />

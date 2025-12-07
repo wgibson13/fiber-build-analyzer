@@ -48,11 +48,11 @@ function GlengarryGrid({ baseInputs, minimumIrr }: GlengarryGridProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-      <h2 className="text-xl font-semibold text-gray-900 mb-6">IRR Analysis Grid</h2>
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
+      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4 sm:mb-6">IRR Analysis Grid</h2>
       
-      <div className="max-h-[70vh] overflow-y-auto">
-        <table className="border-collapse">
+      <div className="max-h-[60vh] sm:max-h-[70vh] overflow-y-auto overflow-x-auto">
+        <table className="border-collapse text-xs sm:text-sm">
           <thead>
             <tr>
               <th className="border border-gray-300 bg-gray-50 px-4 py-2"></th>
@@ -64,13 +64,13 @@ function GlengarryGrid({ baseInputs, minimumIrr }: GlengarryGridProps) {
               </th>
             </tr>
             <tr>
-              <th className="border border-gray-300 bg-gray-50 px-4 py-2 text-left font-semibold text-gray-700">
+              <th className="border border-gray-300 bg-gray-50 px-2 sm:px-4 py-2 text-left font-semibold text-gray-700 text-xs sm:text-sm">
                 Cost per Passing
               </th>
               {penetrations.map((pen) => (
                 <th
                   key={pen}
-                  className="border border-gray-300 bg-gray-50 px-4 py-2 text-center font-semibold text-gray-700"
+                  className="border border-gray-300 bg-gray-50 px-1 sm:px-4 py-2 text-center font-semibold text-gray-700 text-xs sm:text-sm"
                 >
                   {fmtPct(pen)}
                 </th>
@@ -81,7 +81,7 @@ function GlengarryGrid({ baseInputs, minimumIrr }: GlengarryGridProps) {
             {costs.map((cost) => {
               return (
                 <tr key={cost}>
-                  <td className="border border-gray-300 bg-gray-50 px-3 py-2 font-semibold text-gray-700 font-mono text-right">
+                  <td className="border border-gray-300 bg-gray-50 px-2 sm:px-3 py-1 sm:py-2 font-semibold text-gray-700 font-mono text-right text-xs sm:text-sm">
                     {fmtCurrency(cost)}
                   </td>
                   {penetrations.map((pen) => {
@@ -96,7 +96,7 @@ function GlengarryGrid({ baseInputs, minimumIrr }: GlengarryGridProps) {
                     return (
                       <td
                         key={`${cost}-${pen}`}
-                        className={`border border-gray-300 px-3 py-2 text-right font-mono ${cellStyle}`}
+                        className={`border border-gray-300 px-1 sm:px-3 py-1 sm:py-2 text-right font-mono text-xs sm:text-sm ${cellStyle}`}
                       >
                         {formatIrr(result.irr)}
                       </td>
@@ -109,7 +109,7 @@ function GlengarryGrid({ baseInputs, minimumIrr }: GlengarryGridProps) {
         </table>
       </div>
 
-      <div className="mt-6 flex flex-wrap gap-6 text-sm">
+      <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-6 text-xs sm:text-sm">
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-green-500 rounded"></div>
           <span className="text-gray-700">
