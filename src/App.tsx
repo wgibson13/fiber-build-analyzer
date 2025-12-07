@@ -15,20 +15,20 @@ export interface UiInputs extends BaseInputs {
 }
 
 const defaultInputs: UiInputs = {
-  arpu: 60,
+  arpu: 70,
   grossMargin: 0.8,
-  dropCostPerSub: 500,  // Will be computed from components
-  churnRate: 0.03,
-  reinstallCostPerChurn: 300,  // Will be computed from components
+  dropCostPerSub: 600,  // Will be computed from components (250 + 150 + 200)
+  churnRate: 0.02,
+  reinstallCostPerChurn: 200,  // Will be computed from components (150 + 50)
   exitMultiple: 12,
-  horizonYears: 7,
+  horizonYears: 10,
   rampYear1Factor: 0.4,
   rampYear2Factor: 0.7,
-  newDropConstruction: 200,
-  newInstallLabor: 100,
+  newDropConstruction: 250,
+  newInstallLabor: 150,
   newCpeCost: 200,
-  churnInstallLabor: 100,
-  churnCpeCost: 200,
+  churnInstallLabor: 150,
+  churnCpeCost: 50,
 };
 
 function App() {
