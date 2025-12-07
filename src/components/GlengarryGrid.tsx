@@ -113,19 +113,19 @@ function GlengarryGrid({ baseInputs, minimumIrr }: GlengarryGridProps) {
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-green-500 rounded"></div>
           <span className="text-gray-700">
-            <span className="font-semibold">Green:</span> ≥ {fmtPct(minimumIrr + 0.05)} IRR (A / Glengarry)
+            <span className="font-semibold">Green:</span> ≥ {fmtPct(minimumIrr + 0.05)} IRR (A. Glengarry Op!)
           </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-blue-500 rounded"></div>
           <span className="text-gray-700">
-            <span className="font-semibold">Blue:</span> {fmtPct(minimumIrr)}–{fmtPct(minimumIrr + 0.05)} IRR (Borderline)
+            <span className="font-semibold">Blue:</span> {fmtPct(minimumIrr)}–{fmtPct(minimumIrr + 0.05)} IRR (B. Standard)
           </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-6 h-6 bg-red-500 rounded"></div>
           <span className="text-gray-700">
-            <span className="font-semibold">Red:</span> &lt; {fmtPct(minimumIrr)} IRR (Do Not Approve)
+            <span className="font-semibold">Red:</span> &lt; {fmtPct(minimumIrr)} IRR (C. Substandard)
           </span>
         </div>
       </div>
