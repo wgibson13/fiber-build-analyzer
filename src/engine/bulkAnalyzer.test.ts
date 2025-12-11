@@ -56,6 +56,16 @@ describe('Bulk MDU Analyzer', () => {
       expect(result.irr).toBeGreaterThan(0.15);
       expect(result.irr).toBeLessThan(0.20);
     }
+
+    // Sprocket IRR (revenue - DA payment - opex) should be lower
+    // For Larkspur, this should be in the ballpark of 9.5-10.5%
+    expect(result.sprocketIrr).not.toBeNull();
+    if (result.sprocketIrr !== null) {
+      expect(result.sprocketIrr).toBeGreaterThan(0.09);
+      expect(result.sprocketIrr).toBeLessThan(0.11);
+      // Sprocket IRR should be lower than overall project IRR
+      expect(result.sprocketIrr).toBeLessThan(result.irr || 1);
+    }
   });
 
   it('should handle brownfield construction type', () => {

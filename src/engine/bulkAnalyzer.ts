@@ -133,6 +133,7 @@ export type BulkDealResult = {
   paybackYears: number;
   ocfYield: number;
   irr: number | null; // IRR from DA perspective (revenue - opex, excluding DA payment)
+  sprocketIrr: number | null; // Sprocket's internal IRR (revenue - DA payment - opex)
 };
 
 /**
@@ -178,6 +179,14 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
   }
   const irr = solveIrr(cashFlows);
   
+  // Sprocket's internal IRR: Year 0 = -totalCapex, Years 1..termYears = revenue - DA payment - opex
+  // This shows Sprocket's net return after paying DA
+  const cashFlowsSprocket: number[] = [-totalCapex];
+  for (let year = 1; year <= input.termYears; year++) {
+    cashFlowsSprocket.push(netCashFlowPerYear);
+  }
+  const sprocketIrr = solveIrr(cashFlowsSprocket);
+  
   return {
     capexPerUnit,
     totalCapex,
@@ -191,6 +200,7 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
     paybackYears,
     ocfYield,
     irr,
+    sprocketIrr,
   };
 }
 

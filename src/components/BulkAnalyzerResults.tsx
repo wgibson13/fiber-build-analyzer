@@ -120,9 +120,38 @@ export function BulkAnalyzerResults({
                 <td className={valueClasses}>{fmtPct(result.ocfYield)}</td>
               </tr>
               <tr className={`${rowClasses} border-t-2 border-gray-400`}>
-                <td className={`${labelClasses} font-bold`}>IRR</td>
+                <td className={`${labelClasses} font-bold`}>IRR (Overall Project)</td>
                 <td className={`${valueClasses} font-bold`}>
                   {result.irr !== null ? fmtPct(result.irr) : 'N/A'}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Sprocket Internal Economics */}
+        <div>
+          <h3 className="text-base font-semibold text-gray-900 mb-3">
+            Sprocket Internal Economics
+          </h3>
+          <table className="w-full">
+            <tbody>
+              <tr className={rowClasses}>
+                <td className={labelClasses}>Net Cash Flow (after DA payment)</td>
+                <td className={valueClasses}>
+                  {fmtCurrency(result.netCashFlowPerMonth)}
+                </td>
+              </tr>
+              <tr className={rowClasses}>
+                <td className={labelClasses}>Annual Net Cash Flow</td>
+                <td className={valueClasses}>
+                  {fmtCurrency(result.netCashFlowPerYear)}
+                </td>
+              </tr>
+              <tr className={`${rowClasses} border-t-2 border-gray-400`}>
+                <td className={`${labelClasses} font-bold`}>Sprocket IRR</td>
+                <td className={`${valueClasses} font-bold`}>
+                  {result.sprocketIrr !== null ? fmtPct(result.sprocketIrr) : 'N/A'}
                 </td>
               </tr>
             </tbody>
