@@ -55,6 +55,13 @@ describe('Bulk MDU Analyzer', () => {
       expect(result.irr).toBeGreaterThan(0.09);
       expect(result.irr).toBeLessThan(0.11);
     }
+
+    // IRR without DA should be higher (since we're not paying DA)
+    expect(result.irrWithoutDA).not.toBeNull();
+    if (result.irrWithoutDA !== null) {
+      expect(result.irrWithoutDA).toBeGreaterThan(result.irr || 0);
+      expect(result.irrWithoutDA).toBeGreaterThan(0.15); // Should be significantly higher
+    }
   });
 
   it('should handle brownfield construction type', () => {

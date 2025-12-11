@@ -133,6 +133,7 @@ export type BulkDealResult = {
   paybackYears: number;
   ocfYield: number;
   irr: number | null;
+  irrWithoutDA: number | null; // IRR excluding DA payment (treating DA as loan payment)
 };
 
 /**
@@ -168,12 +169,21 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
   const paybackYears = totalCapex / netCashFlowPerYear;
   const ocfYield = netCashFlowPerYear / totalCapex;
   
-  // Simple IRR: Year 0 = -totalCapex, Years 1..termYears = +netCashFlowPerYear
+  // IRR with DA payment: Year 0 = -totalCapex, Years 1..termYears = +netCashFlowPerYear
   const cashFlows: number[] = [-totalCapex];
   for (let year = 1; year <= input.termYears; year++) {
     cashFlows.push(netCashFlowPerYear);
   }
   const irr = solveIrr(cashFlows);
+  
+  // IRR without DA payment: treat DA payment as loan payment, exclude from cash flow
+  const netCashFlowPerMonthWithoutDA = grossRevenuePerMonth - totalOpexPerMonth;
+  const netCashFlowPerYearWithoutDA = netCashFlowPerMonthWithoutDA * 12;
+  const cashFlowsWithoutDA: number[] = [-totalCapex];
+  for (let year = 1; year <= input.termYears; year++) {
+    cashFlowsWithoutDA.push(netCashFlowPerYearWithoutDA);
+  }
+  const irrWithoutDA = solveIrr(cashFlowsWithoutDA);
   
   return {
     capexPerUnit,
@@ -188,6 +198,7 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
     paybackYears,
     ocfYield,
     irr,
+    irrWithoutDA,
   };
 }
 

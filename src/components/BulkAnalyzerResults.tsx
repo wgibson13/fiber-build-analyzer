@@ -120,9 +120,15 @@ export function BulkAnalyzerResults({
                 <td className={valueClasses}>{fmtPct(result.ocfYield)}</td>
               </tr>
               <tr className={`${rowClasses} border-t-2 border-gray-400`}>
-                <td className={`${labelClasses} font-bold`}>IRR</td>
+                <td className={`${labelClasses} font-bold`}>IRR (with DA payment)</td>
                 <td className={`${valueClasses} font-bold`}>
                   {result.irr !== null ? fmtPct(result.irr) : 'N/A'}
+                </td>
+              </tr>
+              <tr className={rowClasses}>
+                <td className={`${labelClasses} font-bold`}>IRR (without DA payment)</td>
+                <td className={`${valueClasses} font-bold`}>
+                  {result.irrWithoutDA !== null ? fmtPct(result.irrWithoutDA) : 'N/A'}
                 </td>
               </tr>
             </tbody>
