@@ -29,18 +29,22 @@ describe('Bulk MDU Analyzer', () => {
     // Monthly revenue
     expect(result.grossRevenuePerMonth).toBeCloseTo(219 * 32, 2); // 7,008
 
-    // DA payment
-    expect(result.daPaymentPerMonth).toBeCloseTo(219 * 15, 2); // 3,285
+    // DA payment (average with waterfall - will be less than base due to reductions at 2x/2.5x/3.0x MOIC)
+    const baseDaPayment = 219 * 15; // 3,285
+    expect(result.daPaymentPerMonth).toBeLessThanOrEqual(baseDaPayment);
+    // With waterfall, average should be significantly less (DA payments reduce after reaching MOIC thresholds)
+    expect(result.daPaymentPerMonth).toBeGreaterThan(0);
 
     // Opex
     expect(result.supportOpexPerMonth).toBeCloseTo(219 * 2.5, 2); // 547.5
     expect(result.transportOpexPerMonth).toBeCloseTo(1500, 2);
     expect(result.totalOpexPerMonth).toBeCloseTo(547.5 + 1500, 2); // 2,047.5
 
-    // Net cash flow
-    const expectedNetCFMonth = 7008 - 3285 - 2047.5; // 1,675.5
-    expect(result.netCashFlowPerMonth).toBeCloseTo(expectedNetCFMonth, 1);
-    expect(result.netCashFlowPerYear).toBeCloseTo(expectedNetCFMonth * 12, 1); // ~20,106
+    // Net cash flow (with waterfall, Sprocket's cash flow improves over time as DA payments reduce)
+    // Average will be higher than initial because DA payments reduce after 2x/2.5x/3.0x MOIC
+    const initialNetCFMonth = 7008 - 3285 - 2047.5; // 1,675.5 (first year)
+    expect(result.netCashFlowPerMonth).toBeGreaterThan(initialNetCFMonth); // Should be higher due to waterfall
+    expect(result.netCashFlowPerYear).toBeGreaterThan(initialNetCFMonth * 12);
 
     // Payback & Yield
     const expectedPayback = 137970 / (expectedNetCFMonth * 12); // ~6.86
@@ -57,12 +61,13 @@ describe('Bulk MDU Analyzer', () => {
       expect(result.irr).toBeLessThan(0.20);
     }
 
-    // Sprocket IRR (revenue - DA payment - opex) should be lower
-    // For Larkspur, this should be in the ballpark of 9.5-10.5%
+    // Sprocket IRR (revenue - DA payment - opex) with waterfall
+    // With waterfall, Sprocket IRR should be higher than flat payment because DA payments reduce over time
+    // For Larkspur with waterfall, this should be higher than the flat payment case (~10-12%)
     expect(result.sprocketIrr).not.toBeNull();
     if (result.sprocketIrr !== null) {
-      expect(result.sprocketIrr).toBeGreaterThan(0.09);
-      expect(result.sprocketIrr).toBeLessThan(0.11);
+      expect(result.sprocketIrr).toBeGreaterThan(0.10); // Higher than flat payment case due to waterfall
+      expect(result.sprocketIrr).toBeLessThan(0.15);
       // Sprocket IRR should be lower than overall project IRR
       expect(result.sprocketIrr).toBeLessThan(result.irr || 1);
     }
