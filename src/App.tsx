@@ -1,56 +1,72 @@
 import { useState } from 'react';
-import InputsPanel from './components/InputsPanel';
-import GlengarryGrid from './components/GlengarryGrid';
-import type { IrrInputs } from './lib/irrModel';
+import { BulkAnalyzerForm } from './components/BulkAnalyzerForm';
+import { BulkAnalyzerResults } from './components/BulkAnalyzerResults';
+import {
+  analyzeBulkDeal,
+  type BulkDealInput,
+  type BulkDealResult,
+} from './engine/bulkAnalyzer';
 
-type BaseInputs = Omit<IrrInputs, 'costPerPassing' | 'steadyStatePenetration'>;
+const defaultInput: BulkDealInput = {
+  propertyName: '',
+  units: 0,
+  constructionType: 'greenfield',
+  termYears: 10,
+  bulkRatePerUnit: 0,
+  buildCostPerUnit: 350,
+  cpeCostPerUnit: 230,
+  installCostPerUnit: 50,
+  doorFeePerUnit: 0,
+  supportOpexPerUnitPerMonth: 2.5,
+  transportOpexPerMonth: 1500,
+  daBulkFeePerUnitPerMonth: 15,
+  discountRate: 0.1,
+};
 
-export interface UiInputs extends BaseInputs {
-  newDropConstruction: number;   // e.g. 200
-  newInstallLabor: number;       // e.g. 100
-  newCpeCost: number;            // e.g. 200
-
-  churnInstallLabor: number;     // e.g. 100
-  churnCpeCost: number;          // e.g. 200
-  
-  minimumIrr: number;            // Minimum IRR threshold (decimal, e.g. 0.15 for 15%)
-}
-
-const defaultInputs: UiInputs = {
-  arpu: 70,
-  grossMargin: 0.8,
-  dropCostPerSub: 600,  // Will be computed from components (250 + 150 + 200)
-  churnRate: 0.02,
-  reinstallCostPerChurn: 200,  // Will be computed from components (150 + 50)
-  exitMultiple: 12,
-  horizonYears: 10,
-  rampYear1Factor: 0.4,
-  rampYear2Factor: 0.7,
-  newDropConstruction: 250,
-  newInstallLabor: 150,
-  newCpeCost: 200,
-  churnInstallLabor: 150,
-  churnCpeCost: 50,
-  minimumIrr: 0.15,
+const larkspurExample: BulkDealInput = {
+  propertyName: 'Larkspur – Juniper',
+  units: 219,
+  constructionType: 'greenfield',
+  termYears: 10,
+  bulkRatePerUnit: 32,
+  buildCostPerUnit: 350,
+  cpeCostPerUnit: 230,
+  installCostPerUnit: 50,
+  doorFeePerUnit: 0,
+  supportOpexPerUnitPerMonth: 2.5,
+  transportOpexPerMonth: 1500,
+  daBulkFeePerUnitPerMonth: 15,
+  discountRate: 0.1,
 };
 
 function App() {
-  const [uiInputs, setUiInputs] = useState<UiInputs>(defaultInputs);
+  const [input, setInput] = useState<BulkDealInput>(defaultInput);
+  const [result, setResult] = useState<BulkDealResult | null>(null);
 
-  // Compute aggregated values for the IRR model
-  const {
-    newDropConstruction,
-    newInstallLabor,
-    newCpeCost,
-    churnInstallLabor,
-    churnCpeCost,
-    ...rest
-  } = uiInputs;
+  const handleLoadExample = () => {
+    setInput(larkspurExample);
+  };
 
-  const baseInputs: BaseInputs = {
-    ...rest,
-    dropCostPerSub: newDropConstruction + newInstallLabor + newCpeCost,
-    reinstallCostPerChurn: churnInstallLabor + churnCpeCost,
+  const handleRunAnalysis = () => {
+    if (input.units <= 0) {
+      alert('Please enter a valid number of units');
+      return;
+    }
+    const analysisResult = analyzeBulkDeal(input);
+    setResult(analysisResult);
+  };
+
+  // Update build cost default when construction type changes
+  const handleInputChange = (newInput: BulkDealInput) => {
+    // If construction type changed, update build cost default
+    if (newInput.constructionType !== input.constructionType) {
+      if (newInput.constructionType === 'greenfield') {
+        newInput.buildCostPerUnit = 350;
+      } else {
+        newInput.buildCostPerUnit = 750;
+      }
+    }
+    setInput(newInput);
   };
 
   return (
@@ -58,18 +74,21 @@ function App() {
       <div className="w-full mx-auto px-4 py-4 sm:px-6 sm:py-6 space-y-4 sm:space-y-6">
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
-            Fiber Build IRR Analyzer
+            EllumNet Bulk MDU Analyzer
           </h1>
           <p className="text-sm sm:text-base text-gray-600">
-            Evaluate fiber build economics by cost and penetration.
+            Internal underwriting tool for bulk MDU internet deals backed by Digital Alpha revenue share.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
-          <InputsPanel value={uiInputs} onChange={setUiInputs} />
-          <div className="lg:col-span-2">
-            <GlengarryGrid baseInputs={baseInputs} minimumIrr={uiInputs.minimumIrr} />
-          </div>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+          <BulkAnalyzerForm
+            input={input}
+            onChange={handleInputChange}
+            onLoadExample={handleLoadExample}
+            onRunAnalysis={handleRunAnalysis}
+          />
+          <BulkAnalyzerResults result={result} propertyName={input.propertyName} />
         </div>
       </div>
     </div>
