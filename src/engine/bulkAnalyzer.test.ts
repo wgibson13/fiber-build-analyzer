@@ -49,18 +49,12 @@ describe('Bulk MDU Analyzer', () => {
     const expectedYield = (expectedNetCFMonth * 12) / 137970; // ~0.1457
     expect(result.ocfYield).toBeCloseTo(expectedYield, 3);
 
-    // IRR should be in the ballpark of 9.5-10.5%
+    // IRR from DA perspective (revenue - opex only) should be higher than Sprocket's net IRR
+    // For Larkspur, this should be in the ballpark of 15-20% (since DA payment is not deducted)
     expect(result.irr).not.toBeNull();
     if (result.irr !== null) {
-      expect(result.irr).toBeGreaterThan(0.09);
-      expect(result.irr).toBeLessThan(0.11);
-    }
-
-    // IRR without DA should be higher (since we're not paying DA)
-    expect(result.irrWithoutDA).not.toBeNull();
-    if (result.irrWithoutDA !== null) {
-      expect(result.irrWithoutDA).toBeGreaterThan(result.irr || 0);
-      expect(result.irrWithoutDA).toBeGreaterThan(0.15); // Should be significantly higher
+      expect(result.irr).toBeGreaterThan(0.15);
+      expect(result.irr).toBeLessThan(0.20);
     }
   });
 

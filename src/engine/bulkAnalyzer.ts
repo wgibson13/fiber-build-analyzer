@@ -132,8 +132,7 @@ export type BulkDealResult = {
   netCashFlowPerYear: number;
   paybackYears: number;
   ocfYield: number;
-  irr: number | null;
-  irrWithoutDA: number | null; // IRR excluding DA payment (treating DA as loan payment)
+  irr: number | null; // IRR from DA perspective (revenue - opex, excluding DA payment)
 };
 
 /**
@@ -169,21 +168,15 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
   const paybackYears = totalCapex / netCashFlowPerYear;
   const ocfYield = netCashFlowPerYear / totalCapex;
   
-  // IRR with DA payment: Year 0 = -totalCapex, Years 1..termYears = +netCashFlowPerYear
+  // IRR from DA perspective: Year 0 = -totalCapex, Years 1..termYears = revenue - opex (DA payment is revenue to DA, not a cost)
+  // This shows the overall project IRR, not Sprocket's net IRR
+  const netCashFlowPerMonthForDA = grossRevenuePerMonth - totalOpexPerMonth;
+  const netCashFlowPerYearForDA = netCashFlowPerMonthForDA * 12;
   const cashFlows: number[] = [-totalCapex];
   for (let year = 1; year <= input.termYears; year++) {
-    cashFlows.push(netCashFlowPerYear);
+    cashFlows.push(netCashFlowPerYearForDA);
   }
   const irr = solveIrr(cashFlows);
-  
-  // IRR without DA payment: treat DA payment as loan payment, exclude from cash flow
-  const netCashFlowPerMonthWithoutDA = grossRevenuePerMonth - totalOpexPerMonth;
-  const netCashFlowPerYearWithoutDA = netCashFlowPerMonthWithoutDA * 12;
-  const cashFlowsWithoutDA: number[] = [-totalCapex];
-  for (let year = 1; year <= input.termYears; year++) {
-    cashFlowsWithoutDA.push(netCashFlowPerYearWithoutDA);
-  }
-  const irrWithoutDA = solveIrr(cashFlowsWithoutDA);
   
   return {
     capexPerUnit,
@@ -198,7 +191,6 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
     paybackYears,
     ocfYield,
     irr,
-    irrWithoutDA,
   };
 }
 
