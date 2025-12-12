@@ -115,6 +115,7 @@ export type BulkDealInput = {
   transportOpexPerMonth: number;
   daBulkFeePerUnitPerMonth: number;
   discountRate: number;
+  leaseUpMonths: number; // Lease up period (only applies to greenfield)
 };
 
 /**
@@ -174,12 +175,30 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
   const cashFlowsDA: number[] = [-daInvestment]; // Year 0: DA invests
   const cashFlowsSprocket: number[] = [-totalCapex]; // Year 0: Sprocket invests (or receives from DA)
   
-  // Calculate year-by-year with waterfall
+  // Lease up: only applies to greenfield, linear ramp-up from 0% to 100% over lease up period
+  const leaseUpMonths = input.constructionType === 'greenfield' ? (input.leaseUpMonths || 0) : 0;
+  
+  // Calculate year-by-year with waterfall and lease up
+  let globalMonth = 0; // Track month from project start
   for (let year = 1; year <= input.termYears; year++) {
     let daPaymentThisYear = 0;
+    let revenueThisYear = 0;
     const monthsInYear = 12;
     
     for (let month = 1; month <= monthsInYear; month++) {
+      globalMonth++;
+      
+      // Lease up multiplier: linear ramp from 0% to 100% over lease up period
+      let leaseUpMultiplier = 1.0;
+      if (leaseUpMonths > 0 && globalMonth <= leaseUpMonths) {
+        // Linear ramp: month 1 = 0%, month leaseUpMonths = 100%
+        leaseUpMultiplier = globalMonth / leaseUpMonths;
+      }
+      
+      // Revenue with lease up discount
+      const revenueThisMonth = grossRevenuePerMonth * leaseUpMultiplier;
+      revenueThisYear += revenueThisMonth;
+      
       // Determine DA payment rate based on cumulative MOIC
       let daPaymentRate = 1.0; // 100% of base payment
       
@@ -199,8 +218,8 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
     // DA cash flow: receives payment (positive)
     cashFlowsDA.push(daPaymentThisYear);
     
-    // Sprocket cash flow: revenue - DA payment - opex
-    const sprocketNetCashFlowThisYear = (grossRevenuePerMonth - totalOpexPerMonth) * 12 - daPaymentThisYear;
+    // Sprocket cash flow: revenue (with lease up) - DA payment - opex
+    const sprocketNetCashFlowThisYear = revenueThisYear - daPaymentThisYear - (totalOpexPerMonth * 12);
     cashFlowsSprocket.push(sprocketNetCashFlowThisYear);
   }
   

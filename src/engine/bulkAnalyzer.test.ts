@@ -16,6 +16,7 @@ describe('Bulk MDU Analyzer', () => {
     transportOpexPerMonth: 1500,
     daBulkFeePerUnitPerMonth: 15,
     discountRate: 0.1,
+    leaseUpMonths: 0,
   };
 
   it('should calculate Larkspur example correctly', () => {

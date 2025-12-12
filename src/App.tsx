@@ -21,6 +21,7 @@ const defaultInput: BulkDealInput = {
   transportOpexPerMonth: 1500,
   daBulkFeePerUnitPerMonth: 15,
   discountRate: 0.1,
+  leaseUpMonths: 0,
 };
 
 function App() {

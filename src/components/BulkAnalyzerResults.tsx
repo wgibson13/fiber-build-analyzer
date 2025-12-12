@@ -116,7 +116,17 @@ export function BulkAnalyzerResults({
                 </td>
               </tr>
               <tr className={rowClasses}>
-                <td className={labelClasses}>OCF Yield</td>
+                <td className={labelClasses}>
+                  <div className="flex items-center gap-1">
+                    <span>OCF Yield</span>
+                    <span
+                      className="text-gray-400 cursor-help"
+                      title="Operating Cash Flow Yield: Annual net cash flow divided by total CapEx. Shows the percentage of initial investment returned each year in cash flow. Does not account for time value of money (unlike IRR)."
+                    >
+                      ℹ️
+                    </span>
+                  </div>
+                </td>
                 <td className={valueClasses}>{fmtPct(result.ocfYield)}</td>
               </tr>
               <tr className={`${rowClasses} border-t-2 border-gray-400`}>
