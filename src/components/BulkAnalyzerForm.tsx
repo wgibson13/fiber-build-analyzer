@@ -166,27 +166,11 @@ export function BulkAnalyzerForm({
               onChange={(e) => handleChange('buildCostPerUnit', parseFloat(e.target.value) || 0)}
               className={selectClasses}
             >
-              {input.constructionType === 'greenfield' ? (
-                <>
-                  <option value={300}>$300</option>
-                  <option value={325}>$325</option>
-                  <option value={350}>$350</option>
-                  <option value={375}>$375</option>
-                  <option value={400}>$400</option>
-                  <option value={450}>$450</option>
-                  <option value={500}>$500</option>
-                </>
-              ) : (
-                <>
-                  <option value={600}>$600</option>
-                  <option value={650}>$650</option>
-                  <option value={700}>$700</option>
-                  <option value={750}>$750</option>
-                  <option value={800}>$800</option>
-                  <option value={850}>$850</option>
-                  <option value={900}>$900</option>
-                </>
-              )}
+              {Array.from({ length: 17 }, (_, i) => (i + 4) * 50).map((cost) => (
+                <option key={cost} value={cost}>
+                  ${cost.toLocaleString()}
+                </option>
+              ))}
             </select>
           </div>
 
