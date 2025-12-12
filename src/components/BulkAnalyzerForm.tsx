@@ -314,17 +314,17 @@ export function BulkAnalyzerForm({
             </label>
             <select
               value={input.fundingSource}
-              onChange={(e) => handleChange('fundingSource', e.target.value as 'da' | 'owner' | 'balanceSheet')}
+              onChange={(e) => handleChange('fundingSource', e.target.value as 'da' | 'owner' | 'internal')}
               className={selectClasses}
             >
               <option value="da">Digital Alpha (DA)</option>
               <option value="owner">Owner / Developer</option>
-              <option value="balanceSheet">Balance Sheet</option>
+              <option value="internal">Internal</option>
             </select>
             <p className="text-xs text-gray-500 mt-1">
               {input.fundingSource === 'da' && 'DA provides capital and receives revenue share'}
               {input.fundingSource === 'owner' && 'Owner provides capital, rate discount applied, no DA revenue share'}
-              {input.fundingSource === 'balanceSheet' && 'Balance sheet funding, no DA revenue share'}
+              {input.fundingSource === 'internal' && 'Internal funding, no DA revenue share'}
             </p>
           </div>
 

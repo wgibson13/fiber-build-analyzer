@@ -116,7 +116,7 @@ export type BulkDealInput = {
   daBulkFeePerUnitPerMonth: number;
   discountRate: number;
   leaseUpMonths: number; // Lease up period (only applies to greenfield)
-  fundingSource: 'da' | 'owner' | 'balanceSheet'; // Who provides the CapEx
+  fundingSource: 'da' | 'owner' | 'internal'; // Who provides the CapEx
   ownerLoanInterestRate: number; // Interest rate for owner loan calculation (only used if fundingSource is 'owner')
 };
 
@@ -200,8 +200,8 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
     
     // No DA revenue share since DA isn't providing capital
     daRevenueShareEnabled = false;
-  } else if (input.fundingSource === 'balanceSheet') {
-    // Balance sheet funding - no rate discount, no DA revenue share
+  } else if (input.fundingSource === 'internal') {
+    // Internal funding - no rate discount, no DA revenue share
     daRevenueShareEnabled = false;
   }
   // If fundingSource is 'da', keep defaults (DA provides capital, revenue share enabled)
