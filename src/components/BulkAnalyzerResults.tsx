@@ -1,15 +1,28 @@
-import type { BulkDealResult } from '../engine/bulkAnalyzer';
+import type { BulkDealInput, BulkDealResult } from '../engine/bulkAnalyzer';
 import { fmtCurrency, fmtPct } from '../lib/format';
+import { generateProposalPDF } from '../lib/generateProposal';
 
 interface BulkAnalyzerResultsProps {
   result: BulkDealResult | null;
+  input: BulkDealInput;
   propertyName: string;
 }
 
 export function BulkAnalyzerResults({
   result,
+  input,
   propertyName,
 }: BulkAnalyzerResultsProps) {
+  const handleGeneratePDF = async () => {
+    if (!result) return;
+    try {
+      await generateProposalPDF(input, result);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Error generating PDF. Please try again.');
+    }
+  };
+
   if (!result) {
     return (
       <div className="bg-white rounded-xl shadow-md border border-gray-200 p-6">
@@ -27,9 +40,17 @@ export function BulkAnalyzerResults({
 
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 sm:p-6">
-      <h2 className="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
-        Results: {propertyName || 'Untitled Property'}
-      </h2>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
+          Results: {propertyName || 'Untitled Property'}
+        </h2>
+        <button
+          onClick={handleGeneratePDF}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+        >
+          Generate PDF Proposal
+        </button>
+      </div>
 
       <div className="space-y-6">
         {/* CapEx Section */}

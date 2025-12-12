@@ -12,6 +12,8 @@
     "test:ui": "vitest --ui"
   },
   "dependencies": {
+    "jspdf": "^3.0.4",
+    "jspdf-autotable": "^5.0.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -32,4 +34,3 @@
     "vitest": "^1.0.4"
   }
 }
-

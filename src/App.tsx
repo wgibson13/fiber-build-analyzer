@@ -70,7 +70,7 @@ function App() {
             onChange={handleInputChange}
             onRunAnalysis={handleRunAnalysis}
           />
-          <BulkAnalyzerResults result={result} propertyName={input.propertyName} />
+          <BulkAnalyzerResults result={result} input={input} propertyName={input.propertyName} />
         </div>
       </div>
     </div>
