@@ -304,32 +304,32 @@ export function BulkAnalyzerForm({
 
         <div className="pt-2 border-t border-gray-200">
           <h3 className="text-base font-semibold text-gray-900 mb-3">
-            Owner CapEx Contribution
+            Funding Source
           </h3>
 
-          {/* Owner CapEx Percentage */}
+          {/* Funding Source */}
           <div className="mb-4">
             <label className="block text-sm font-bold text-gray-700 mb-1">
-              Owner CapEx Contribution (%)
+              CapEx Funding Source
             </label>
             <select
-              value={input.ownerCapexPercentage}
-              onChange={(e) => handleChange('ownerCapexPercentage', parseFloat(e.target.value) || 0)}
+              value={input.fundingSource}
+              onChange={(e) => handleChange('fundingSource', e.target.value as 'da' | 'owner' | 'balanceSheet')}
               className={selectClasses}
             >
-              <option value={0}>0% (No contribution)</option>
-              <option value={25}>25%</option>
-              <option value={50}>50%</option>
-              <option value={75}>75%</option>
-              <option value={100}>100%</option>
+              <option value="da">Digital Alpha (DA)</option>
+              <option value="owner">Owner / Developer</option>
+              <option value="balanceSheet">Balance Sheet</option>
             </select>
             <p className="text-xs text-gray-500 mt-1">
-              Owner contribution is rounded to the nearest thousand
+              {input.fundingSource === 'da' && 'DA provides capital and receives revenue share'}
+              {input.fundingSource === 'owner' && 'Owner provides capital, rate discount applied, no DA revenue share'}
+              {input.fundingSource === 'balanceSheet' && 'Balance sheet funding, no DA revenue share'}
             </p>
           </div>
 
           {/* Owner Loan Interest Rate */}
-          {input.ownerCapexPercentage > 0 && (
+          {input.fundingSource === 'owner' && (
             <div className="mb-4">
               <label className="block text-sm font-bold text-gray-700 mb-1">
                 Owner Loan Interest Rate (%)

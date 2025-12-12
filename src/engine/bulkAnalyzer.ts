@@ -116,8 +116,8 @@ export type BulkDealInput = {
   daBulkFeePerUnitPerMonth: number;
   discountRate: number;
   leaseUpMonths: number; // Lease up period (only applies to greenfield)
-  ownerCapexPercentage: number; // Percentage of CapEx owner contributes (0-100)
-  ownerLoanInterestRate: number; // Interest rate for owner loan calculation
+  fundingSource: 'da' | 'owner' | 'balanceSheet'; // Who provides the CapEx
+  ownerLoanInterestRate: number; // Interest rate for owner loan calculation (only used if fundingSource is 'owner')
 };
 
 /**
@@ -176,14 +176,14 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
   
   const totalCapex = input.units * capexPerUnit;
   
-  // Owner CapEx contribution and rate discount calculation
-  let ownerCapexContribution = 0;
+  // Funding source determines CapEx provider and DA revenue share
   let rateDiscountPerUnit = 0;
   let adjustedBulkRatePerUnit = input.bulkRatePerUnit;
+  let daRevenueShareEnabled = true;
   
-  if (input.ownerCapexPercentage > 0 && input.ownerCapexPercentage <= 100) {
-    // Calculate owner contribution (rounded to nearest thousand)
-    ownerCapexContribution = Math.round((input.ownerCapexPercentage / 100) * totalCapex / 1000) * 1000;
+  if (input.fundingSource === 'owner') {
+    // Owner provides all CapEx - calculate rate discount based on loan payment
+    const ownerCapexContribution = totalCapex; // Owner provides 100% of CapEx
     
     // Calculate monthly payment on a loan of owner's contribution at selected rate
     const monthlyLoanPayment = calculateMonthlyPayment(
@@ -197,13 +197,22 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
     
     // Adjusted bulk rate = original rate - discount
     adjustedBulkRatePerUnit = Math.max(0, input.bulkRatePerUnit - rateDiscountPerUnit);
+    
+    // No DA revenue share since DA isn't providing capital
+    daRevenueShareEnabled = false;
+  } else if (input.fundingSource === 'balanceSheet') {
+    // Balance sheet funding - no rate discount, no DA revenue share
+    daRevenueShareEnabled = false;
   }
+  // If fundingSource is 'da', keep defaults (DA provides capital, revenue share enabled)
   
-  // Monthly revenue (using adjusted rate if owner contributes)
+  // Monthly revenue (using adjusted rate if owner provides funding)
   const grossRevenuePerMonth = (input.units || 0) * adjustedBulkRatePerUnit;
   
-  // Base DA payment per month (before waterfall)
-  const baseDaPaymentPerMonth = input.units * input.daBulkFeePerUnitPerMonth;
+  // Base DA payment per month (before waterfall) - only if DA is providing capital
+  const baseDaPaymentPerMonth = daRevenueShareEnabled 
+    ? input.units * input.daBulkFeePerUnitPerMonth 
+    : 0;
   
   // Opex
   const supportOpexPerMonth = input.units * input.supportOpexPerUnitPerMonth;
@@ -211,18 +220,18 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
   const totalOpexPerMonth = supportOpexPerMonth + transportOpexPerMonth;
   
   // DA Waterfall: Calculate year-by-year cash flows to track MOIC thresholds
-  // DA invests totalCapex, receives payments until reaching MOIC thresholds
+  // DA invests totalCapex (only if DA is funding source), receives payments until reaching MOIC thresholds
   // 2.0x MOIC: payment reduces to 50%
   // 2.5x MOIC: payment reduces to 25%
   // 3.0x MOIC: payment reduces to 0% (DA fully paid back)
-  const daInvestment = totalCapex;
+  const daInvestment = daRevenueShareEnabled ? totalCapex : 0;
   const moic2x = daInvestment * 2.0;
   const moic2_5x = daInvestment * 2.5;
   const moic3x = daInvestment * 3.0;
   
   let cumulativeDaReceived = 0;
-  const cashFlowsDA: number[] = [-daInvestment]; // Year 0: DA invests
-  const cashFlowsSprocket: number[] = [-totalCapex]; // Year 0: Sprocket invests (or receives from DA)
+  const cashFlowsDA: number[] = [-daInvestment]; // Year 0: DA invests (or 0 if not DA funding)
+  const cashFlowsSprocket: number[] = [-totalCapex]; // Year 0: Sprocket invests (or receives from DA/Owner/Balance Sheet)
   
   // Lease up: only applies to greenfield, linear ramp-up from 0% to 100% over lease up period
   const leaseUpMonths = input.constructionType === 'greenfield' ? (input.leaseUpMonths || 0) : 0;
@@ -248,15 +257,17 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
       const revenueThisMonth = (input.units * adjustedBulkRatePerUnit) * leaseUpMultiplier;
       revenueThisYear += revenueThisMonth;
       
-      // Determine DA payment rate based on cumulative MOIC
-      let daPaymentRate = 1.0; // 100% of base payment
+      // Determine DA payment rate based on cumulative MOIC (only if DA is providing capital)
+      let daPaymentRate = daRevenueShareEnabled ? 1.0 : 0.0; // 100% of base payment if DA funding, else 0
       
-      if (cumulativeDaReceived >= moic3x) {
-        daPaymentRate = 0.0; // 0% after 3.0x MOIC
-      } else if (cumulativeDaReceived >= moic2_5x) {
-        daPaymentRate = 0.25; // 25% after 2.5x MOIC
-      } else if (cumulativeDaReceived >= moic2x) {
-        daPaymentRate = 0.5; // 50% after 2.0x MOIC
+      if (daRevenueShareEnabled) {
+        if (cumulativeDaReceived >= moic3x) {
+          daPaymentRate = 0.0; // 0% after 3.0x MOIC
+        } else if (cumulativeDaReceived >= moic2_5x) {
+          daPaymentRate = 0.25; // 25% after 2.5x MOIC
+        } else if (cumulativeDaReceived >= moic2x) {
+          daPaymentRate = 0.5; // 50% after 2.0x MOIC
+        }
       }
       
       const daPaymentThisMonth = baseDaPaymentPerMonth * daPaymentRate;
