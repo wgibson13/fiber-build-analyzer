@@ -106,11 +106,15 @@ export function BulkAnalyzerForm({
             <input
               type="number"
               step="0.01"
-              value={input.bulkRatePerUnit === 0 ? '' : input.bulkRatePerUnit}
+              value={input.bulkRatePerUnit}
               onChange={(e) => {
                 const val = e.target.value;
-                const num = val === '' ? 0 : parseFloat(val);
-                handleChange('bulkRatePerUnit', isNaN(num) ? 0 : num);
+                if (val === '' || val === '-') {
+                  handleChange('bulkRatePerUnit', 0);
+                } else {
+                  const num = parseFloat(val);
+                  handleChange('bulkRatePerUnit', isNaN(num) ? 0 : num);
+                }
               }}
               className={inputClasses}
             />
