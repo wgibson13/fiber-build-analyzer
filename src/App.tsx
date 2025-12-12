@@ -8,8 +8,8 @@ import {
 } from './engine/bulkAnalyzer';
 
 const defaultInput: BulkDealInput = {
-  propertyName: '',
-  units: 0,
+  propertyName: 'Foxfern I-30',
+  units: 301,
   constructionType: 'greenfield',
   termYears: 10,
   bulkRatePerUnit: 0,
@@ -23,29 +23,9 @@ const defaultInput: BulkDealInput = {
   discountRate: 0.1,
 };
 
-const larkspurExample: BulkDealInput = {
-  propertyName: 'Larkspur – Juniper',
-  units: 219,
-  constructionType: 'greenfield',
-  termYears: 10,
-  bulkRatePerUnit: 32,
-  buildCostPerUnit: 350,
-  cpeCostPerUnit: 230,
-  installCostPerUnit: 50,
-  doorFeePerUnit: 0,
-  supportOpexPerUnitPerMonth: 2.5,
-  transportOpexPerMonth: 1500,
-  daBulkFeePerUnitPerMonth: 15,
-  discountRate: 0.1,
-};
-
 function App() {
   const [input, setInput] = useState<BulkDealInput>(defaultInput);
   const [result, setResult] = useState<BulkDealResult | null>(null);
-
-  const handleLoadExample = () => {
-    setInput(larkspurExample);
-  };
 
   const handleRunAnalysis = () => {
     if (input.units <= 0) {
@@ -85,7 +65,6 @@ function App() {
           <BulkAnalyzerForm
             input={input}
             onChange={handleInputChange}
-            onLoadExample={handleLoadExample}
             onRunAnalysis={handleRunAnalysis}
           />
           <BulkAnalyzerResults result={result} propertyName={input.propertyName} />

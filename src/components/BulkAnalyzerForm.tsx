@@ -3,14 +3,12 @@ import type { BulkDealInput } from '../engine/bulkAnalyzer';
 interface BulkAnalyzerFormProps {
   input: BulkDealInput;
   onChange: (input: BulkDealInput) => void;
-  onLoadExample: () => void;
   onRunAnalysis: () => void;
 }
 
 export function BulkAnalyzerForm({
   input,
   onChange,
-  onLoadExample,
   onRunAnalysis,
 }: BulkAnalyzerFormProps) {
   const handleChange = <K extends keyof BulkDealInput>(
@@ -25,16 +23,10 @@ export function BulkAnalyzerForm({
 
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 sm:p-6 space-y-4 sm:space-y-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4">
         <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
           Deal Inputs
         </h2>
-        <button
-          onClick={onLoadExample}
-          className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-md border border-gray-300"
-        >
-          Load Larkspur Example
-        </button>
       </div>
 
       <div className="space-y-4">
@@ -285,5 +277,6 @@ export function BulkAnalyzerForm({
     </div>
   );
 }
+
 
 
