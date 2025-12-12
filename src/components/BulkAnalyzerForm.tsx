@@ -20,6 +20,8 @@ export function BulkAnalyzerForm({
 
   const inputClasses =
     'w-full px-3 py-2 text-right font-mono border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm';
+  const selectClasses =
+    'w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm';
 
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -115,13 +117,17 @@ export function BulkAnalyzerForm({
           <label className="block text-sm font-bold text-gray-700 mb-1">
             Term (Years)
           </label>
-          <input
-            type="number"
+          <select
             value={input.termYears}
             onChange={(e) => handleChange('termYears', parseInt(e.target.value) || 10)}
-            className={inputClasses}
-            min="1"
-          />
+            className={selectClasses}
+          >
+            <option value={5}>5 years</option>
+            <option value={7}>7 years</option>
+            <option value={10}>10 years</option>
+            <option value={15}>15 years</option>
+            <option value={20}>20 years</option>
+          </select>
         </div>
 
         <div className="pt-2 border-t border-gray-200">
@@ -132,21 +138,22 @@ export function BulkAnalyzerForm({
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Bulk Rate per Unit ($/month)
             </label>
-            <input
-              type="number"
-              step="0.01"
+            <select
               value={input.bulkRatePerUnit}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (val === '' || val === '-') {
-                  handleChange('bulkRatePerUnit', 0);
-                } else {
-                  const num = parseFloat(val);
-                  handleChange('bulkRatePerUnit', isNaN(num) ? 0 : num);
-                }
-              }}
-              className={inputClasses}
-            />
+              onChange={(e) => handleChange('bulkRatePerUnit', parseFloat(e.target.value) || 0)}
+              className={selectClasses}
+            >
+              <option value={0}>Select rate...</option>
+              <option value={25}>$25/month</option>
+              <option value={28}>$28/month</option>
+              <option value={30}>$30/month</option>
+              <option value={32}>$32/month</option>
+              <option value={35}>$35/month</option>
+              <option value={38}>$38/month</option>
+              <option value={40}>$40/month</option>
+              <option value={45}>$45/month</option>
+              <option value={50}>$50/month</option>
+            </select>
           </div>
         </div>
 
@@ -158,15 +165,33 @@ export function BulkAnalyzerForm({
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Build Cost per Unit ($)
             </label>
-            <input
-              type="number"
-              step="0.01"
+            <select
               value={input.buildCostPerUnit}
-              onChange={(e) =>
-                handleChange('buildCostPerUnit', parseFloat(e.target.value) || 0)
-              }
-              className={inputClasses}
-            />
+              onChange={(e) => handleChange('buildCostPerUnit', parseFloat(e.target.value) || 0)}
+              className={selectClasses}
+            >
+              {input.constructionType === 'greenfield' ? (
+                <>
+                  <option value={300}>$300</option>
+                  <option value={325}>$325</option>
+                  <option value={350}>$350</option>
+                  <option value={375}>$375</option>
+                  <option value={400}>$400</option>
+                  <option value={450}>$450</option>
+                  <option value={500}>$500</option>
+                </>
+              ) : (
+                <>
+                  <option value={600}>$600</option>
+                  <option value={650}>$650</option>
+                  <option value={700}>$700</option>
+                  <option value={750}>$750</option>
+                  <option value={800}>$800</option>
+                  <option value={850}>$850</option>
+                  <option value={900}>$900</option>
+                </>
+              )}
+            </select>
           </div>
 
           {/* CPE Cost */}
@@ -174,15 +199,19 @@ export function BulkAnalyzerForm({
             <label className="block text-sm font-bold text-gray-700 mb-1">
               CPE Cost per Unit ($)
             </label>
-            <input
-              type="number"
-              step="0.01"
+            <select
               value={input.cpeCostPerUnit}
-              onChange={(e) =>
-                handleChange('cpeCostPerUnit', parseFloat(e.target.value) || 0)
-              }
-              className={inputClasses}
-            />
+              onChange={(e) => handleChange('cpeCostPerUnit', parseFloat(e.target.value) || 0)}
+              className={selectClasses}
+            >
+              <option value={200}>$200</option>
+              <option value={220}>$220</option>
+              <option value={230}>$230</option>
+              <option value={240}>$240</option>
+              <option value={250}>$250</option>
+              <option value={275}>$275</option>
+              <option value={300}>$300</option>
+            </select>
           </div>
 
           {/* Install Cost */}
@@ -190,15 +219,19 @@ export function BulkAnalyzerForm({
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Install Cost per Unit ($)
             </label>
-            <input
-              type="number"
-              step="0.01"
+            <select
               value={input.installCostPerUnit}
-              onChange={(e) =>
-                handleChange('installCostPerUnit', parseFloat(e.target.value) || 0)
-              }
-              className={inputClasses}
-            />
+              onChange={(e) => handleChange('installCostPerUnit', parseFloat(e.target.value) || 0)}
+              className={selectClasses}
+            >
+              <option value={40}>$40</option>
+              <option value={45}>$45</option>
+              <option value={50}>$50</option>
+              <option value={55}>$55</option>
+              <option value={60}>$60</option>
+              <option value={75}>$75</option>
+              <option value={100}>$100</option>
+            </select>
           </div>
 
           {/* Door Fee */}
@@ -206,15 +239,19 @@ export function BulkAnalyzerForm({
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Door Fee per Unit ($)
             </label>
-            <input
-              type="number"
-              step="0.01"
+            <select
               value={input.doorFeePerUnit}
-              onChange={(e) =>
-                handleChange('doorFeePerUnit', parseFloat(e.target.value) || 0)
-              }
-              className={inputClasses}
-            />
+              onChange={(e) => handleChange('doorFeePerUnit', parseFloat(e.target.value) || 0)}
+              className={selectClasses}
+            >
+              <option value={0}>$0</option>
+              <option value={25}>$25</option>
+              <option value={50}>$50</option>
+              <option value={75}>$75</option>
+              <option value={100}>$100</option>
+              <option value={150}>$150</option>
+              <option value={200}>$200</option>
+            </select>
           </div>
         </div>
 
@@ -226,18 +263,19 @@ export function BulkAnalyzerForm({
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Support Opex per Unit per Month ($)
             </label>
-            <input
-              type="number"
-              step="0.01"
+            <select
               value={input.supportOpexPerUnitPerMonth}
-              onChange={(e) =>
-                handleChange(
-                  'supportOpexPerUnitPerMonth',
-                  parseFloat(e.target.value) || 0
-                )
-              }
-              className={inputClasses}
-            />
+              onChange={(e) => handleChange('supportOpexPerUnitPerMonth', parseFloat(e.target.value) || 0)}
+              className={selectClasses}
+            >
+              <option value={2.0}>$2.00</option>
+              <option value={2.25}>$2.25</option>
+              <option value={2.5}>$2.50</option>
+              <option value={2.75}>$2.75</option>
+              <option value={3.0}>$3.00</option>
+              <option value={3.5}>$3.50</option>
+              <option value={4.0}>$4.00</option>
+            </select>
           </div>
 
           {/* Transport Opex */}
@@ -245,15 +283,19 @@ export function BulkAnalyzerForm({
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Transport Opex per Month ($)
             </label>
-            <input
-              type="number"
-              step="0.01"
+            <select
               value={input.transportOpexPerMonth}
-              onChange={(e) =>
-                handleChange('transportOpexPerMonth', parseFloat(e.target.value) || 0)
-              }
-              className={inputClasses}
-            />
+              onChange={(e) => handleChange('transportOpexPerMonth', parseFloat(e.target.value) || 0)}
+              className={selectClasses}
+            >
+              <option value={1000}>$1,000</option>
+              <option value={1200}>$1,200</option>
+              <option value={1500}>$1,500</option>
+              <option value={1800}>$1,800</option>
+              <option value={2000}>$2,000</option>
+              <option value={2500}>$2,500</option>
+              <option value={3000}>$3,000</option>
+            </select>
           </div>
         </div>
 
@@ -265,18 +307,20 @@ export function BulkAnalyzerForm({
             <label className="block text-sm font-bold text-gray-700 mb-1">
               DA Bulk Fee per Unit per Month ($)
             </label>
-            <input
-              type="number"
-              step="0.01"
+            <select
               value={input.daBulkFeePerUnitPerMonth}
-              onChange={(e) =>
-                handleChange(
-                  'daBulkFeePerUnitPerMonth',
-                  parseFloat(e.target.value) || 0
-                )
-              }
-              className={inputClasses}
-            />
+              onChange={(e) => handleChange('daBulkFeePerUnitPerMonth', parseFloat(e.target.value) || 0)}
+              className={selectClasses}
+            >
+              <option value={12}>$12</option>
+              <option value={13}>$13</option>
+              <option value={15}>$15</option>
+              <option value={17}>$17</option>
+              <option value={18}>$18</option>
+              <option value={20}>$20</option>
+              <option value={22}>$22</option>
+              <option value={25}>$25</option>
+            </select>
           </div>
         </div>
 
@@ -290,15 +334,17 @@ export function BulkAnalyzerForm({
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Discount Rate (reference only, v1)
             </label>
-            <input
-              type="number"
-              step="0.01"
+            <select
               value={input.discountRate}
-              onChange={(e) =>
-                handleChange('discountRate', parseFloat(e.target.value) || 0.1)
-              }
-              className={inputClasses}
-            />
+              onChange={(e) => handleChange('discountRate', parseFloat(e.target.value) || 0.1)}
+              className={selectClasses}
+            >
+              <option value={0.08}>8%</option>
+              <option value={0.09}>9%</option>
+              <option value={0.10}>10%</option>
+              <option value={0.11}>11%</option>
+              <option value={0.12}>12%</option>
+            </select>
           </div>
         </div>
 
