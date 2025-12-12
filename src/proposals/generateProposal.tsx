@@ -1,0 +1,58 @@
+import { pdf } from '@react-pdf/renderer';
+import { ProposalPdfDocument } from './ProposalPdfDocument';
+import type { BulkDealInput, BulkDealResult } from '../engine/bulkAnalyzer';
+import { analyzeBulkDeal } from '../engine/bulkAnalyzer';
+
+/**
+ * Generate and download a PDF proposal
+ */
+export async function generateProposalPDF(
+  input: BulkDealInput,
+  result: BulkDealResult
+): Promise<void> {
+  // Calculate scenarios for 10Y and 15Y terms
+  const input10Y = { ...input, termYears: 10 };
+  const input15Y = { ...input, termYears: 15 };
+  
+  const result10Y = analyzeBulkDeal(input10Y);
+  const result15Y = analyzeBulkDeal(input15Y);
+  
+  // Calculate Owner scenarios (if funding source is owner, use that; otherwise simulate)
+  let result10YOwner: BulkDealResult;
+  let result15YOwner: BulkDealResult;
+  
+  if (input.fundingSource === 'owner') {
+    // Already owner-funded, use same results
+    result10YOwner = result10Y;
+    result15YOwner = result15Y;
+  } else {
+    // Simulate owner funding scenario
+    const input10YOwner = { ...input10Y, fundingSource: 'owner' as const };
+    const input15YOwner = { ...input15Y, fundingSource: 'owner' as const };
+    result10YOwner = analyzeBulkDeal(input10YOwner);
+    result15YOwner = analyzeBulkDeal(input15YOwner);
+  }
+  
+  // Generate PDF
+  const doc = (
+    <ProposalPdfDocument
+      input={input}
+      result={result}
+      result10Y={result10Y}
+      result15Y={result15Y}
+      result10YOwner={result10YOwner}
+      result15YOwner={result15YOwner}
+    />
+  );
+  
+  const blob = await pdf(doc).toBlob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${input.propertyName || 'Proposal'}_Bulk_Proposal_${new Date().toISOString().split('T')[0]}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+

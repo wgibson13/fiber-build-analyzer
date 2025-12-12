@@ -137,6 +137,13 @@ export type BulkDealResult = {
   ocfYield: number;
   irr: number | null; // IRR from DA perspective (revenue - opex, excluding DA payment)
   sprocketIrr: number | null; // Sprocket's internal IRR (revenue - DA payment - opex)
+  // Year-by-year cash flows for PDF/analysis
+  yearlyCashFlows: {
+    year: number;
+    providerCashFlow: number; // Provider perspective (revenue - DA payment - opex)
+    ownerCashFlow: number; // Owner perspective (revenue - opex, no DA payment)
+    daPayment: number;
+  }[];
 };
 
 /**
@@ -302,6 +309,30 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
   // Sprocket's internal IRR: Year 0 = -totalCapex, Years 1..termYears = revenue - DA payment - opex
   const sprocketIrr = solveIrr(cashFlowsSprocket);
   
+  // Build year-by-year cash flows for PDF/analysis using actual calculated values
+  const yearlyCashFlows: {
+    year: number;
+    providerCashFlow: number;
+    ownerCashFlow: number;
+    daPayment: number;
+  }[] = [];
+  
+  // Use the actual cash flows we calculated
+  for (let year = 1; year <= input.termYears; year++) {
+    const providerCF = cashFlowsSprocket[year] || 0;
+    const daPayment = cashFlowsDA[year] || 0;
+    // Owner cash flow = revenue - opex (no DA payment)
+    // Approximate from provider CF + DA payment
+    const ownerCF = providerCF + daPayment;
+    
+    yearlyCashFlows.push({
+      year,
+      providerCashFlow: providerCF,
+      ownerCashFlow: ownerCF,
+      daPayment,
+    });
+  }
+  
   return {
     capexPerUnit,
     totalCapex,
@@ -316,6 +347,7 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
     ocfYield,
     irr,
     sprocketIrr,
+    yearlyCashFlows,
   };
 }
 

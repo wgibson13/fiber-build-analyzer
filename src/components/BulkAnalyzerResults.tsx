@@ -1,6 +1,6 @@
 import type { BulkDealInput, BulkDealResult } from '../engine/bulkAnalyzer';
 import { fmtCurrency, fmtPct } from '../lib/format';
-import { generateProposalPDF } from '../lib/generateProposal';
+import { generateProposalPDF } from '../proposals/generateProposal';
 
 interface BulkAnalyzerResultsProps {
   result: BulkDealResult | null;
@@ -46,9 +46,10 @@ export function BulkAnalyzerResults({
         </h2>
         <button
           onClick={handleGeneratePDF}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+          disabled={!result}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
         >
-          Generate PDF Proposal
+          Download Proposal PDF
         </button>
       </div>
 
