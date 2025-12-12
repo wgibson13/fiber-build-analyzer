@@ -22,6 +22,8 @@ const defaultInput: BulkDealInput = {
   daBulkFeePerUnitPerMonth: 15,
   discountRate: 0.1,
   leaseUpMonths: 0,
+  ownerCapexPercentage: 0,
+  ownerLoanInterestRate: 0.05,
 };
 
 function App() {

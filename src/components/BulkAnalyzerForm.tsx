@@ -304,6 +304,57 @@ export function BulkAnalyzerForm({
 
         <div className="pt-2 border-t border-gray-200">
           <h3 className="text-base font-semibold text-gray-900 mb-3">
+            Owner CapEx Contribution
+          </h3>
+
+          {/* Owner CapEx Percentage */}
+          <div className="mb-4">
+            <label className="block text-sm font-bold text-gray-700 mb-1">
+              Owner CapEx Contribution (%)
+            </label>
+            <select
+              value={input.ownerCapexPercentage}
+              onChange={(e) => handleChange('ownerCapexPercentage', parseFloat(e.target.value) || 0)}
+              className={selectClasses}
+            >
+              <option value={0}>0% (No contribution)</option>
+              <option value={25}>25%</option>
+              <option value={50}>50%</option>
+              <option value={75}>75%</option>
+              <option value={100}>100%</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Owner contribution is rounded to the nearest thousand
+            </p>
+          </div>
+
+          {/* Owner Loan Interest Rate */}
+          {input.ownerCapexPercentage > 0 && (
+            <div className="mb-4">
+              <label className="block text-sm font-bold text-gray-700 mb-1">
+                Owner Loan Interest Rate (%)
+              </label>
+              <select
+                value={input.ownerLoanInterestRate}
+                onChange={(e) => handleChange('ownerLoanInterestRate', parseFloat(e.target.value) || 0.05)}
+                className={selectClasses}
+              >
+                <option value={0.03}>3%</option>
+                <option value={0.04}>4%</option>
+                <option value={0.05}>5%</option>
+                <option value={0.06}>6%</option>
+                <option value={0.07}>7%</option>
+                <option value={0.08}>8%</option>
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Used to calculate rate discount based on owner's CapEx contribution
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="pt-2 border-t border-gray-200">
+          <h3 className="text-base font-semibold text-gray-900 mb-3">
             Financial Parameters
           </h3>
 

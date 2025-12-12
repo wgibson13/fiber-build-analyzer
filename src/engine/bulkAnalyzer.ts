@@ -116,6 +116,8 @@ export type BulkDealInput = {
   daBulkFeePerUnitPerMonth: number;
   discountRate: number;
   leaseUpMonths: number; // Lease up period (only applies to greenfield)
+  ownerCapexPercentage: number; // Percentage of CapEx owner contributes (0-100)
+  ownerLoanInterestRate: number; // Interest rate for owner loan calculation
 };
 
 /**
@@ -138,6 +140,30 @@ export type BulkDealResult = {
 };
 
 /**
+ * Calculate monthly loan payment (PMT function)
+ * @param principal Loan amount
+ * @param annualRate Annual interest rate (as decimal, e.g., 0.05 for 5%)
+ * @param termYears Loan term in years
+ * @returns Monthly payment amount
+ */
+function calculateMonthlyPayment(principal: number, annualRate: number, termYears: number): number {
+  if (principal === 0 || termYears === 0) return 0;
+  
+  const monthlyRate = annualRate / 12;
+  const numPayments = termYears * 12;
+  
+  if (monthlyRate === 0) {
+    // No interest, just divide principal by number of payments
+    return principal / numPayments;
+  }
+  
+  const monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) /
+    (Math.pow(1 + monthlyRate, numPayments) - 1);
+  
+  return monthlyPayment;
+}
+
+/**
  * Calculate bulk MDU deal economics
  */
 export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
@@ -150,8 +176,31 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
   
   const totalCapex = input.units * capexPerUnit;
   
-  // Monthly revenue
-  const grossRevenuePerMonth = (input.units || 0) * (input.bulkRatePerUnit || 0);
+  // Owner CapEx contribution and rate discount calculation
+  let ownerCapexContribution = 0;
+  let rateDiscountPerUnit = 0;
+  let adjustedBulkRatePerUnit = input.bulkRatePerUnit;
+  
+  if (input.ownerCapexPercentage > 0 && input.ownerCapexPercentage <= 100) {
+    // Calculate owner contribution (rounded to nearest thousand)
+    ownerCapexContribution = Math.round((input.ownerCapexPercentage / 100) * totalCapex / 1000) * 1000;
+    
+    // Calculate monthly payment on a loan of owner's contribution at selected rate
+    const monthlyLoanPayment = calculateMonthlyPayment(
+      ownerCapexContribution,
+      input.ownerLoanInterestRate,
+      input.termYears
+    );
+    
+    // Discount per unit per month = monthly loan payment / units
+    rateDiscountPerUnit = input.units > 0 ? monthlyLoanPayment / input.units : 0;
+    
+    // Adjusted bulk rate = original rate - discount
+    adjustedBulkRatePerUnit = Math.max(0, input.bulkRatePerUnit - rateDiscountPerUnit);
+  }
+  
+  // Monthly revenue (using adjusted rate if owner contributes)
+  const grossRevenuePerMonth = (input.units || 0) * adjustedBulkRatePerUnit;
   
   // Base DA payment per month (before waterfall)
   const baseDaPaymentPerMonth = input.units * input.daBulkFeePerUnitPerMonth;
@@ -195,8 +244,8 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
         leaseUpMultiplier = globalMonth / leaseUpMonths;
       }
       
-      // Revenue with lease up discount
-      const revenueThisMonth = grossRevenuePerMonth * leaseUpMultiplier;
+      // Revenue with lease up discount (using adjusted bulk rate if owner contributes)
+      const revenueThisMonth = (input.units * adjustedBulkRatePerUnit) * leaseUpMultiplier;
       revenueThisYear += revenueThisMonth;
       
       // Determine DA payment rate based on cumulative MOIC

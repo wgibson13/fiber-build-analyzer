@@ -17,6 +17,8 @@ describe('Bulk MDU Analyzer', () => {
     daBulkFeePerUnitPerMonth: 15,
     discountRate: 0.1,
     leaseUpMonths: 0,
+    ownerCapexPercentage: 0,
+    ownerLoanInterestRate: 0.05,
   };
 
   it('should calculate Larkspur example correctly', () => {
