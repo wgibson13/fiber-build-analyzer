@@ -150,7 +150,7 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
   const totalCapex = input.units * capexPerUnit;
   
   // Monthly revenue
-  const grossRevenuePerMonth = input.units * input.bulkRatePerUnit;
+  const grossRevenuePerMonth = (input.units || 0) * (input.bulkRatePerUnit || 0);
   
   // Base DA payment per month (before waterfall)
   const baseDaPaymentPerMonth = input.units * input.daBulkFeePerUnitPerMonth;
