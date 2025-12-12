@@ -144,15 +144,11 @@ export function BulkAnalyzerForm({
               className={selectClasses}
             >
               <option value={0}>Select rate...</option>
-              <option value={25}>$25/month</option>
-              <option value={28}>$28/month</option>
-              <option value={30}>$30/month</option>
-              <option value={32}>$32/month</option>
-              <option value={35}>$35/month</option>
-              <option value={38}>$38/month</option>
-              <option value={40}>$40/month</option>
-              <option value={45}>$45/month</option>
-              <option value={50}>$50/month</option>
+              {Array.from({ length: 51 }, (_, i) => i + 10).map((rate) => (
+                <option key={rate} value={rate}>
+                  ${rate}/month
+                </option>
+              ))}
             </select>
           </div>
         </div>
@@ -288,13 +284,11 @@ export function BulkAnalyzerForm({
               onChange={(e) => handleChange('transportOpexPerMonth', parseFloat(e.target.value) || 0)}
               className={selectClasses}
             >
-              <option value={1000}>$1,000</option>
-              <option value={1200}>$1,200</option>
-              <option value={1500}>$1,500</option>
-              <option value={1800}>$1,800</option>
-              <option value={2000}>$2,000</option>
-              <option value={2500}>$2,500</option>
-              <option value={3000}>$3,000</option>
+              {Array.from({ length: 16 }, (_, i) => (i + 5) * 100).map((amount) => (
+                <option key={amount} value={amount}>
+                  ${amount.toLocaleString()}
+                </option>
+              ))}
             </select>
           </div>
         </div>
