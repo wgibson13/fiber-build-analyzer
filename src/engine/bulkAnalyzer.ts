@@ -127,7 +127,8 @@ export type BulkDealResult = {
   capexPerUnit: number;
   totalCapex: number;
   grossRevenuePerMonth: number;
-  daPaymentPerMonth: number;
+  daPaymentPerMonth: number; // Average DA payment per month (with waterfall)
+  daPaymentInitial: number; // Initial DA payment per month (before waterfall, $15/unit)
   supportOpexPerMonth: number;
   transportOpexPerMonth: number;
   totalOpexPerMonth: number;
@@ -144,6 +145,15 @@ export type BulkDealResult = {
     ownerCashFlow: number; // Owner perspective (revenue - opex, no DA payment)
     daPayment: number;
   }[];
+  // DA waterfall milestones
+  daWaterfall: {
+    moic2xMonth: number | null; // Month when 2x MOIC is reached (payment reduces to 50%)
+    moic2_5xMonth: number | null; // Month when 2.5x MOIC is reached (payment reduces to 25%)
+    moic3xMonth: number | null; // Month when 3.0x MOIC is reached (payment reduces to 0%)
+    moic2xAmount: number; // Total amount at 2x MOIC threshold
+    moic2_5xAmount: number; // Total amount at 2.5x MOIC threshold
+    moic3xAmount: number; // Total amount at 3.0x MOIC threshold
+  };
 };
 
 /**
@@ -294,6 +304,50 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
   const totalDaPayments = cashFlowsDA.slice(1).reduce((sum, cf) => sum + cf, 0);
   const averageDaPaymentPerMonth = totalDaPayments / (input.termYears * 12);
   
+  // Track DA waterfall milestones (when MOIC thresholds are reached)
+  // This needs to account for payment reductions as thresholds are reached
+  let moic2xMonth: number | null = null;
+  let moic2_5xMonth: number | null = null;
+  let moic3xMonth: number | null = null;
+  
+  // Recalculate to find milestone months, accounting for payment reductions
+  if (daRevenueShareEnabled) {
+    let cumulativeDaReceived2 = 0;
+    let globalMonth2 = 0;
+    
+    for (let year = 1; year <= input.termYears; year++) {
+      for (let month = 1; month <= 12; month++) {
+        globalMonth2++;
+        
+        // Determine current payment rate based on cumulative received
+        let currentPaymentRate = 1.0; // 100% initially
+        if (cumulativeDaReceived2 >= moic3x) {
+          currentPaymentRate = 0.0; // 0% after 3.0x MOIC
+        } else if (cumulativeDaReceived2 >= moic2_5x) {
+          currentPaymentRate = 0.25; // 25% after 2.5x MOIC
+        } else if (cumulativeDaReceived2 >= moic2x) {
+          currentPaymentRate = 0.5; // 50% after 2.0x MOIC
+        }
+        
+        const daPaymentThisMonth = baseDaPaymentPerMonth * currentPaymentRate;
+        cumulativeDaReceived2 += daPaymentThisMonth;
+        
+        // Check milestones (only set once, when threshold is first crossed)
+        if (!moic2xMonth && cumulativeDaReceived2 >= moic2x) {
+          moic2xMonth = globalMonth2;
+        }
+        if (!moic2_5xMonth && cumulativeDaReceived2 >= moic2_5x) {
+          moic2_5xMonth = globalMonth2;
+        }
+        if (!moic3xMonth && cumulativeDaReceived2 >= moic3x) {
+          moic3xMonth = globalMonth2;
+          break; // No need to continue after 3x
+        }
+      }
+      if (moic3xMonth) break;
+    }
+  }
+  
   // Average net cash flow for Sprocket (for display)
   const totalSprocketCashFlow = cashFlowsSprocket.slice(1).reduce((sum, cf) => sum + cf, 0);
   const averageNetCashFlowPerYear = totalSprocketCashFlow / input.termYears;
@@ -338,6 +392,7 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
     totalCapex,
     grossRevenuePerMonth,
     daPaymentPerMonth: averageDaPaymentPerMonth, // Average DA payment per month (with waterfall)
+    daPaymentInitial: baseDaPaymentPerMonth, // Initial DA payment per month (before waterfall)
     supportOpexPerMonth,
     transportOpexPerMonth,
     totalOpexPerMonth,
@@ -348,6 +403,14 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
     irr,
     sprocketIrr,
     yearlyCashFlows,
+    daWaterfall: {
+      moic2xMonth,
+      moic2_5xMonth,
+      moic3xMonth,
+      moic2xAmount: moic2x,
+      moic2_5xAmount: moic2_5x,
+      moic3xAmount: moic3x,
+    },
   };
 }
 
