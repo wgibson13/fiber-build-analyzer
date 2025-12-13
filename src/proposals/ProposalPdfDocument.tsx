@@ -314,16 +314,16 @@ export const ProposalPdfDocument: React.FC<ProposalPdfDocumentProps> = ({
         <View style={styles.marketingBox}>
           <Text style={styles.marketingTitle}>About EllumNet, LLC</Text>
           <Text style={styles.marketingText}>
-            EllumNet is a leading provider of fiber-optic internet services for multi-dwelling units (MDUs) 
-            across the United States. We specialize in delivering high-speed, reliable internet connectivity 
-            to residential properties, helping property owners enhance their properties' value while providing 
-            tenants with world-class internet service.
+            EllumNet, LLC is a North Texas-based provider of fiber-optic internet services for 
+            multi-dwelling units (MDUs). We specialize in delivering high-speed, reliable internet 
+            connectivity to residential properties throughout the region, helping property owners enhance 
+            their properties' value while providing tenants with world-class internet service.
           </Text>
           <Text style={styles.marketingText}>
             Our partnership model allows property owners to offer premium internet as an amenity without 
-            capital investment or operational burden. With years of experience and a proven track record, 
-            EllumNet has successfully deployed fiber infrastructure to hundreds of properties, creating 
-            win-win scenarios for property owners and tenants alike.
+            capital investment or operational burden. With a proven track record in North Texas, 
+            EllumNet has successfully deployed fiber infrastructure to properties across the region, 
+            creating win-win scenarios for property owners and tenants alike.
           </Text>
         </View>
 

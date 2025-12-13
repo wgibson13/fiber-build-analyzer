@@ -1,6 +1,6 @@
 import type { BulkDealInput, BulkDealResult } from '../engine/bulkAnalyzer';
 import { fmtCurrency, fmtPct } from '../lib/format';
-import { generateProposalPDF } from '../proposals/generateProposal';
+import { generateProposalPDF, generateBoardApprovalPDF } from '../proposals/generateProposal';
 
 interface BulkAnalyzerResultsProps {
   result: BulkDealResult | null;
@@ -20,6 +20,16 @@ export function BulkAnalyzerResults({
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Error generating PDF. Please try again.');
+    }
+  };
+
+  const handleGenerateBoardApproval = async () => {
+    if (!result) return;
+    try {
+      await generateBoardApprovalPDF(input, result);
+    } catch (error) {
+      console.error('Error generating board approval PDF:', error);
+      alert('Error generating board approval PDF. Please try again.');
     }
   };
 
@@ -44,7 +54,7 @@ export function BulkAnalyzerResults({
         <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
           Results: {propertyName || 'Untitled Property'}
         </h2>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             onClick={() => handleGeneratePDF(true)}
             disabled={!result}
@@ -60,6 +70,14 @@ export function BulkAnalyzerResults({
             title="Financial analysis only, no features section"
           >
             Financial Only
+          </button>
+          <button
+            onClick={handleGenerateBoardApproval}
+            disabled={!result}
+            className="px-3 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 text-xs sm:text-sm"
+            title="Board approval document with capital usage and DA cash flows"
+          >
+            Board Approval
           </button>
         </div>
       </div>

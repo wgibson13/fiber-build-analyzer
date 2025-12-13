@@ -1,5 +1,6 @@
 import { pdf } from '@react-pdf/renderer';
 import { ProposalPdfDocument } from './ProposalPdfDocument';
+import { BoardApprovalPdfDocument } from './BoardApprovalPdfDocument';
 import type { BulkDealInput, BulkDealResult } from '../engine/bulkAnalyzer';
 import { analyzeBulkDeal } from '../engine/bulkAnalyzer';
 
@@ -56,6 +57,32 @@ export async function generateProposalPDF(
   link.href = url;
   const versionSuffix = includeFeatures ? '' : '_Financial_Only';
   link.download = `${input.propertyName || 'Proposal'}_Bulk_Proposal${versionSuffix}_${new Date().toISOString().split('T')[0]}.pdf`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
+
+/**
+ * Generate and download a board approval PDF document
+ */
+export async function generateBoardApprovalPDF(
+  input: BulkDealInput,
+  result: BulkDealResult
+): Promise<void> {
+  // Generate PDF
+  const doc = (
+    <BoardApprovalPdfDocument
+      input={input}
+      result={result}
+    />
+  );
+  
+  const blob = await pdf(doc).toBlob();
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `${input.propertyName || 'Proposal'}_Board_Approval_${new Date().toISOString().split('T')[0]}.pdf`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

@@ -12,11 +12,13 @@ describe('Bulk MDU Analyzer', () => {
     cpeCostPerUnit: 230,
     installCostPerUnit: 50,
     doorFeePerUnit: 0,
+    oltCostPerUnit: 0,
     supportOpexPerUnitPerMonth: 2.5,
     transportOpexPerMonth: 1500,
     daBulkFeePerUnitPerMonth: 15,
     discountRate: 0.1,
     leaseUpMonths: 0,
+    buildTimelineMonths: 6,
     fundingSource: 'da',
     ownerLoanInterestRate: 0.05,
   };
@@ -24,8 +26,8 @@ describe('Bulk MDU Analyzer', () => {
   it('should calculate Larkspur example correctly', () => {
     const result = analyzeBulkDeal(larkspurInput);
 
-    // CapEx checks
-    const expectedCapexPerUnit = 350 + 230 + 50 + 0; // 630
+    // CapEx checks (including OLT cost which is 0 in test)
+    const expectedCapexPerUnit = 350 + 230 + 50 + 0 + 0; // 630 (build + CPE + install + door + OLT)
     expect(result.capexPerUnit).toBeCloseTo(expectedCapexPerUnit, 2);
     expect(result.totalCapex).toBeCloseTo(219 * 630, 2); // 137,970
 

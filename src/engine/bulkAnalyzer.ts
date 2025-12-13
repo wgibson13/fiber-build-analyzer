@@ -111,11 +111,13 @@ export type BulkDealInput = {
   cpeCostPerUnit: number;
   installCostPerUnit: number;
   doorFeePerUnit: number;
+  oltCostPerUnit: number; // OLT/OLT ports cost per unit (shared infrastructure cost allocated per unit)
   supportOpexPerUnitPerMonth: number;
   transportOpexPerMonth: number;
   daBulkFeePerUnitPerMonth: number;
   discountRate: number;
   leaseUpMonths: number; // Lease up period (only applies to greenfield)
+  buildTimelineMonths: number; // Build timeline in months (default 6 for greenfield)
   fundingSource: 'da' | 'owner' | 'internal'; // Who provides the CapEx
   ownerLoanInterestRate: number; // Interest rate for owner loan calculation (only used if fundingSource is 'owner')
 };
@@ -154,6 +156,13 @@ export type BulkDealResult = {
     moic2_5xAmount: number; // Total amount at 2.5x MOIC threshold
     moic3xAmount: number; // Total amount at 3.0x MOIC threshold
   };
+  // Capital outflow schedule
+  capitalOutflowSchedule: {
+    month: number;
+    amount: number;
+    description: string;
+  }[];
+  buildTimelineMonths: number;
 };
 
 /**
@@ -189,9 +198,49 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
     input.buildCostPerUnit +
     input.cpeCostPerUnit +
     input.installCostPerUnit +
-    input.doorFeePerUnit;
+    input.doorFeePerUnit +
+    input.oltCostPerUnit;
   
   const totalCapex = input.units * capexPerUnit;
+  
+  // Capital outflow timing
+  // First 50% of build timeline: fiber installation costs (buildCostPerUnit)
+  // Last month: equipment costs (CPE + OLT + install + door fee)
+  const buildTimelineMonths = input.buildTimelineMonths || (input.constructionType === 'greenfield' ? 6 : 3);
+  const fiberInstallCost = input.buildCostPerUnit * input.units;
+  const equipmentCost = (input.cpeCostPerUnit + input.oltCostPerUnit + input.installCostPerUnit + input.doorFeePerUnit) * input.units;
+  
+  // Calculate monthly capital outflow schedule
+  const capitalOutflowSchedule: { month: number; amount: number; description: string }[] = [];
+  const fiberInstallMonths = Math.floor(buildTimelineMonths * 0.5);
+  const monthlyFiberInstall = fiberInstallMonths > 0 ? fiberInstallCost / fiberInstallMonths : 0;
+  
+  // First half: fiber installation
+  for (let month = 1; month <= fiberInstallMonths; month++) {
+    capitalOutflowSchedule.push({
+      month,
+      amount: monthlyFiberInstall,
+      description: 'Fiber Installation',
+    });
+  }
+  
+  // Middle months: no capital outflow (if any)
+  for (let month = fiberInstallMonths + 1; month < buildTimelineMonths; month++) {
+    capitalOutflowSchedule.push({
+      month,
+      amount: 0,
+      description: 'Build Phase',
+    });
+  }
+  
+  // Last month: all equipment costs
+  if (buildTimelineMonths > 0) {
+    capitalOutflowSchedule.push({
+      month: buildTimelineMonths,
+      amount: equipmentCost,
+      description: 'Equipment & Installation',
+    });
+  }
   
   // Funding source determines CapEx provider and DA revenue share
   let rateDiscountPerUnit = 0;
@@ -411,6 +460,8 @@ export function analyzeBulkDeal(input: BulkDealInput): BulkDealResult {
       moic2_5xAmount: moic2_5x,
       moic3xAmount: moic3x,
     },
+    capitalOutflowSchedule,
+    buildTimelineMonths,
   };
 }
 

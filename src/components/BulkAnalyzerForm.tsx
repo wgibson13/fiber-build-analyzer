@@ -83,6 +83,33 @@ export function BulkAnalyzerForm({
           )}
         </div>
 
+        {/* Build Timeline */}
+        <div>
+          <label className="block text-sm font-bold text-gray-700 mb-1">
+            Build Timeline (months)
+          </label>
+          <select
+            value={input.buildTimelineMonths}
+            onChange={(e) =>
+              handleChange('buildTimelineMonths', parseInt(e.target.value) || 6)
+            }
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+          >
+            <option value={3}>3 months</option>
+            <option value={4}>4 months</option>
+            <option value={5}>5 months</option>
+            <option value={6}>6 months</option>
+            <option value={7}>7 months</option>
+            <option value={8}>8 months</option>
+            <option value={9}>9 months</option>
+            <option value={10}>10 months</option>
+            <option value={12}>12 months</option>
+          </select>
+          <p className="text-xs text-gray-500 mt-1">
+            Time from fiber pull start to building ready for lease up
+          </p>
+        </div>
+
         {/* Lease Up (only for greenfield) */}
         {input.constructionType === 'greenfield' && (
           <div>
@@ -232,6 +259,30 @@ export function BulkAnalyzerForm({
               <option value={150}>$150</option>
               <option value={200}>$200</option>
             </select>
+          </div>
+
+          {/* OLT Cost */}
+          <div className="mb-4">
+            <label className="block text-sm font-bold text-gray-700 mb-1">
+              OLT / OLT Ports Cost per Unit ($)
+            </label>
+            <select
+              value={input.oltCostPerUnit}
+              onChange={(e) => handleChange('oltCostPerUnit', parseFloat(e.target.value) || 0)}
+              className={selectClasses}
+            >
+              <option value={0}>$0</option>
+              <option value={10}>$10</option>
+              <option value={15}>$15</option>
+              <option value={20}>$20</option>
+              <option value={25}>$25</option>
+              <option value={30}>$30</option>
+              <option value={40}>$40</option>
+              <option value={50}>$50</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">
+              Shared infrastructure cost allocated per unit
+            </p>
           </div>
         </div>
 

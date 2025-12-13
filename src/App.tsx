@@ -17,11 +17,13 @@ const defaultInput: BulkDealInput = {
   cpeCostPerUnit: 230,
   installCostPerUnit: 50,
   doorFeePerUnit: 0,
+  oltCostPerUnit: 0, // Will need to be set based on Excel BOM
   supportOpexPerUnitPerMonth: 2.5,
   transportOpexPerMonth: 1500,
   daBulkFeePerUnitPerMonth: 15,
   discountRate: 0.1,
   leaseUpMonths: 0,
+  buildTimelineMonths: 6, // Default 6 months for greenfield
   fundingSource: 'da',
   ownerLoanInterestRate: 0.05,
 };
@@ -41,12 +43,14 @@ function App() {
 
   // Update build cost default when construction type changes
   const handleInputChange = (newInput: BulkDealInput) => {
-    // If construction type changed, update build cost default
+    // If construction type changed, update build cost default and build timeline
     if (newInput.constructionType !== input.constructionType) {
       if (newInput.constructionType === 'greenfield') {
         newInput.buildCostPerUnit = 350;
+        newInput.buildTimelineMonths = 6; // Default 6 months for greenfield
       } else {
         newInput.buildCostPerUnit = 750;
+        newInput.buildTimelineMonths = 3; // Default 3 months for brownfield
       }
     }
     setInput(newInput);
