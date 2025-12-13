@@ -61,10 +61,11 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     alignItems: 'flex-start',
   },
-  valuePropIcon: {
-    fontSize: 16,
+  valuePropBullet: {
+    fontSize: 14,
     marginRight: 10,
     color: '#3b82f6',
+    fontWeight: 'bold',
   },
   valuePropText: {
     fontSize: 11,
@@ -221,6 +222,26 @@ const styles = StyleSheet.create({
     color: '#166534',
     marginBottom: 10,
   },
+  // Marketing section
+  marketingBox: {
+    backgroundColor: '#fef3c7',
+    border: '1 solid #fbbf24',
+    borderRadius: 6,
+    padding: 15,
+    marginBottom: 20,
+  },
+  marketingTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#92400e',
+    marginBottom: 10,
+  },
+  marketingText: {
+    fontSize: 10,
+    color: '#78350f',
+    lineHeight: 1.5,
+    marginBottom: 8,
+  },
 });
 
 interface ProposalPdfDocumentProps {
@@ -230,6 +251,7 @@ interface ProposalPdfDocumentProps {
   result15Y: BulkDealResult;
   result10YOwner: BulkDealResult;
   result15YOwner: BulkDealResult;
+  includeFeatures?: boolean; // Whether to include features/benefits section
 }
 
 export const ProposalPdfDocument: React.FC<ProposalPdfDocumentProps> = ({
@@ -239,6 +261,7 @@ export const ProposalPdfDocument: React.FC<ProposalPdfDocumentProps> = ({
   result15Y,
   result10YOwner,
   result15YOwner,
+  includeFeatures = true,
 }) => {
   const currentDate = new Date().toLocaleDateString('en-US', {
     year: 'numeric',
@@ -251,8 +274,14 @@ export const ProposalPdfDocument: React.FC<ProposalPdfDocumentProps> = ({
   const owner15YAnnualNOI = result15YOwner.netCashFlowPerYear;
   const owner10YTotalNOI = owner10YAnnualNOI * 10;
   const owner15YTotalNOI = owner15YAnnualNOI * 15;
-  const owner10YBEP = result.totalCapex / result10YOwner.netCashFlowPerMonth;
-  const owner15YBEP = result.totalCapex / result15YOwner.netCashFlowPerMonth;
+  
+  // Break-even only applies if owner is contributing capital
+  const owner10YBEP = input.fundingSource === 'owner' 
+    ? (result.totalCapex / result10YOwner.netCashFlowPerMonth)
+    : null;
+  const owner15YBEP = input.fundingSource === 'owner'
+    ? (result.totalCapex / result15YOwner.netCashFlowPerMonth)
+    : null;
   
   // Determine if zero capital investment
   const zeroCapitalInvestment = input.fundingSource === 'da';
@@ -266,7 +295,7 @@ export const ProposalPdfDocument: React.FC<ProposalPdfDocumentProps> = ({
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start' }}>
             <View style={{ flex: 1 }}>
               <Text style={styles.coverTitle}>Bulk Internet Proposal</Text>
-              <Text style={styles.coverSubtitle}>EllumNet / Sprocket Networks</Text>
+              <Text style={styles.coverSubtitle}>EllumNet, LLC</Text>
               <Text style={styles.coverPropertyName}>{input.propertyName}</Text>
               <Text style={{ fontSize: 12, color: '#6b7280', marginTop: 5 }}>
                 {input.units} Units • Generated {currentDate}
@@ -281,47 +310,66 @@ export const ProposalPdfDocument: React.FC<ProposalPdfDocumentProps> = ({
           </View>
         </View>
 
-        {/* Value Proposition Box */}
-        <View style={styles.valuePropBox}>
-          <Text style={styles.valuePropTitle}>Why Partner with EllumNet?</Text>
-          
-          <View style={styles.valuePropItem}>
-            <Text style={styles.valuePropIcon}>💰</Text>
-            <Text style={styles.valuePropText}>
-              <Text style={{ fontWeight: 'bold' }}>Passive Revenue Stream:</Text> Generate recurring monthly income with zero operational burden. We handle all installation, maintenance, and customer support.
-            </Text>
-          </View>
+        {/* About EllumNet Section */}
+        <View style={styles.marketingBox}>
+          <Text style={styles.marketingTitle}>About EllumNet, LLC</Text>
+          <Text style={styles.marketingText}>
+            EllumNet is a leading provider of fiber-optic internet services for multi-dwelling units (MDUs) 
+            across the United States. We specialize in delivering high-speed, reliable internet connectivity 
+            to residential properties, helping property owners enhance their properties' value while providing 
+            tenants with world-class internet service.
+          </Text>
+          <Text style={styles.marketingText}>
+            Our partnership model allows property owners to offer premium internet as an amenity without 
+            capital investment or operational burden. With years of experience and a proven track record, 
+            EllumNet has successfully deployed fiber infrastructure to hundreds of properties, creating 
+            win-win scenarios for property owners and tenants alike.
+          </Text>
+        </View>
 
-          <View style={styles.valuePropItem}>
-            <Text style={styles.valuePropIcon}>🏆</Text>
-            <Text style={styles.valuePropText}>
-              <Text style={{ fontWeight: 'bold' }}>Competitive Advantage:</Text> Offer high-speed fiber internet as a premium amenity that attracts and retains quality tenants, setting your property apart from competitors.
-            </Text>
-          </View>
-
-          {zeroCapitalInvestment && (
+        {/* Value Proposition Box - Only if includeFeatures is true */}
+        {includeFeatures && (
+          <View style={styles.valuePropBox}>
+            <Text style={styles.valuePropTitle}>Why Partner with EllumNet?</Text>
+            
             <View style={styles.valuePropItem}>
-              <Text style={styles.valuePropIcon}>✅</Text>
+              <Text style={styles.valuePropBullet}>•</Text>
               <Text style={styles.valuePropText}>
-                <Text style={{ fontWeight: 'bold' }}>Zero Capital Investment:</Text> We provide 100% of the capital required. You receive revenue share with no upfront costs or financial risk.
+                <Text style={{ fontWeight: 'bold' }}>Passive Revenue Stream:</Text> Generate recurring monthly income with zero operational burden. We handle all installation, maintenance, and customer support.
               </Text>
             </View>
-          )}
 
-          <View style={styles.valuePropItem}>
-            <Text style={styles.valuePropIcon}>📈</Text>
-            <Text style={styles.valuePropText}>
-              <Text style={{ fontWeight: 'bold' }}>Long-Term Stability:</Text> 10-15 year agreements provide predictable, stable income that enhances your property's value and NOI.
-            </Text>
-          </View>
+            <View style={styles.valuePropItem}>
+              <Text style={styles.valuePropBullet}>•</Text>
+              <Text style={styles.valuePropText}>
+                <Text style={{ fontWeight: 'bold' }}>Competitive Advantage:</Text> Offer high-speed fiber internet as a premium amenity that attracts and retains quality tenants, setting your property apart from competitors.
+              </Text>
+            </View>
 
-          <View style={styles.valuePropItem}>
-            <Text style={styles.valuePropIcon}>😊</Text>
-            <Text style={styles.valuePropText}>
-              <Text style={{ fontWeight: 'bold' }}>Tenant Satisfaction:</Text> Fast, reliable internet is the #1 amenity tenants look for. Happy tenants mean lower turnover and higher retention rates.
-            </Text>
+            {zeroCapitalInvestment && (
+              <View style={styles.valuePropItem}>
+                <Text style={styles.valuePropBullet}>•</Text>
+                <Text style={styles.valuePropText}>
+                  <Text style={{ fontWeight: 'bold' }}>Zero Capital Investment:</Text> We provide 100% of the capital required. You receive revenue share with no upfront costs or financial risk.
+                </Text>
+              </View>
+            )}
+
+            <View style={styles.valuePropItem}>
+              <Text style={styles.valuePropBullet}>•</Text>
+              <Text style={styles.valuePropText}>
+                <Text style={{ fontWeight: 'bold' }}>Long-Term Stability:</Text> 10-15 year agreements provide predictable, stable income that enhances your property's value and NOI.
+              </Text>
+            </View>
+
+            <View style={styles.valuePropItem}>
+              <Text style={styles.valuePropBullet}>•</Text>
+              <Text style={styles.valuePropText}>
+                <Text style={{ fontWeight: 'bold' }}>Tenant Satisfaction:</Text> Fast, reliable internet is the #1 amenity tenants look for. Happy tenants mean lower turnover and higher retention rates.
+              </Text>
+            </View>
           </View>
-        </View>
+        )}
 
         {/* Financial Highlights */}
         <View style={styles.financialHighlights}>
@@ -351,27 +399,30 @@ export const ProposalPdfDocument: React.FC<ProposalPdfDocumentProps> = ({
             </View>
           </View>
 
-          <View style={styles.twoColumn}>
-            <View style={[styles.column]}>
-              <View style={styles.highlightBox}>
-                <Text style={styles.highlightLabel}>Break-Even Timeline</Text>
-                <Text style={[styles.highlightValue, { fontSize: 20 }]}>
-                  {owner10YBEP < 12 ? `${owner10YBEP.toFixed(1)} months` : `${(owner10YBEP / 12).toFixed(1)} years`}
-                </Text>
-                <Text style={styles.highlightSubtext}>10-Year Term</Text>
+          {/* Break-Even - Only show if owner is contributing capital */}
+          {owner10YBEP !== null && owner15YBEP !== null && (
+            <View style={styles.twoColumn}>
+              <View style={[styles.column]}>
+                <View style={styles.highlightBox}>
+                  <Text style={styles.highlightLabel}>Break-Even Timeline</Text>
+                  <Text style={[styles.highlightValue, { fontSize: 20 }]}>
+                    {owner10YBEP < 12 ? `${owner10YBEP.toFixed(1)} months` : `${(owner10YBEP / 12).toFixed(1)} years`}
+                  </Text>
+                  <Text style={styles.highlightSubtext}>10-Year Term</Text>
+                </View>
+              </View>
+              
+              <View style={[styles.column]}>
+                <View style={styles.highlightBox}>
+                  <Text style={styles.highlightLabel}>Break-Even Timeline</Text>
+                  <Text style={[styles.highlightValue, { fontSize: 20 }]}>
+                    {owner15YBEP < 12 ? `${owner15YBEP.toFixed(1)} months` : `${(owner15YBEP / 12).toFixed(1)} years`}
+                  </Text>
+                  <Text style={styles.highlightSubtext}>15-Year Term</Text>
+                </View>
               </View>
             </View>
-            
-            <View style={[styles.column]}>
-              <View style={styles.highlightBox}>
-                <Text style={styles.highlightLabel}>Break-Even Timeline</Text>
-                <Text style={[styles.highlightValue, { fontSize: 20 }]}>
-                  {owner15YBEP < 12 ? `${owner15YBEP.toFixed(1)} months` : `${(owner15YBEP / 12).toFixed(1)} years`}
-                </Text>
-                <Text style={styles.highlightSubtext}>15-Year Term</Text>
-              </View>
-            </View>
-          </View>
+          )}
 
           {zeroCapitalInvestment && (
             <View style={styles.comparisonBox}>
@@ -394,8 +445,116 @@ export const ProposalPdfDocument: React.FC<ProposalPdfDocumentProps> = ({
         </View>
       </Page>
 
-      {/* Page 2: Detailed Financial Analysis */}
+      {/* Page 2: Owner Options Comparison & Financial Analysis */}
       <Page size="LETTER" style={styles.page}>
+        {/* Owner Options Comparison */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Owner Funding Options Comparison</Text>
+          
+          <View style={styles.table}>
+            <View style={[styles.tableRow, styles.tableHeader]}>
+              <Text style={[styles.tableCell, styles.col25, styles.tableHeaderText]}>Metric</Text>
+              <Text style={[styles.tableCell, styles.col25, styles.tableHeaderText]}>Provider Funded</Text>
+              <Text style={[styles.tableCell, styles.col25, styles.tableHeaderText]}>Owner Funded</Text>
+            </View>
+            
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.col25]}>Your Capital Investment</Text>
+              <Text style={[styles.tableCellRight, styles.col25, { color: '#059669', fontWeight: 'bold' }]}>
+                $0
+              </Text>
+              <Text style={[styles.tableCellRight, styles.col25]}>
+                {fmtCurrency(result.totalCapex)}
+              </Text>
+            </View>
+            
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.col25]}>Monthly Revenue Share (10Y)</Text>
+              <Text style={[styles.tableCellRight, styles.col25]}>
+                {fmtCurrency(result10Y.grossRevenuePerMonth - result10Y.daPaymentPerMonth)}
+              </Text>
+              <Text style={[styles.tableCellRight, styles.col25, styles.tableCellBold]}>
+                {fmtCurrency(result10YOwner.grossRevenuePerMonth)}
+              </Text>
+            </View>
+            
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.col25]}>Annual NOI (10Y)</Text>
+              <Text style={[styles.tableCellRight, styles.col25]}>
+                {fmtCurrency(result10Y.netCashFlowPerYear)}
+              </Text>
+              <Text style={[styles.tableCellRight, styles.col25, styles.tableCellBold]}>
+                {fmtCurrency(result10YOwner.netCashFlowPerYear)}
+              </Text>
+            </View>
+            
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.col25]}>Total 10-Year NOI</Text>
+              <Text style={[styles.tableCellRight, styles.col25]}>
+                {fmtCurrency(result10Y.netCashFlowPerYear * 10)}
+              </Text>
+              <Text style={[styles.tableCellRight, styles.col25, styles.tableCellBold]}>
+                {fmtCurrency(owner10YTotalNOI)}
+              </Text>
+            </View>
+            
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.col25]}>Break-Even (10Y)</Text>
+              <Text style={[styles.tableCellRight, styles.col25, { color: '#059669', fontWeight: 'bold' }]}>
+                N/A (No investment)
+              </Text>
+              <Text style={[styles.tableCellRight, styles.col25]}>
+                {owner10YBEP !== null 
+                  ? (owner10YBEP < 12 ? `${owner10YBEP.toFixed(1)} months` : `${(owner10YBEP / 12).toFixed(1)} years`)
+                  : 'N/A'}
+              </Text>
+            </View>
+            
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.col25]}>Monthly Revenue Share (15Y)</Text>
+              <Text style={[styles.tableCellRight, styles.col25]}>
+                {fmtCurrency(result15Y.grossRevenuePerMonth - result15Y.daPaymentPerMonth)}
+              </Text>
+              <Text style={[styles.tableCellRight, styles.col25, styles.tableCellBold]}>
+                {fmtCurrency(result15YOwner.grossRevenuePerMonth)}
+              </Text>
+            </View>
+            
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.col25]}>Annual NOI (15Y)</Text>
+              <Text style={[styles.tableCellRight, styles.col25]}>
+                {fmtCurrency(result15Y.netCashFlowPerYear)}
+              </Text>
+              <Text style={[styles.tableCellRight, styles.col25, styles.tableCellBold]}>
+                {fmtCurrency(owner15YAnnualNOI)}
+              </Text>
+            </View>
+            
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.col25]}>Total 15-Year NOI</Text>
+              <Text style={[styles.tableCellRight, styles.col25]}>
+                {fmtCurrency(result15Y.netCashFlowPerYear * 15)}
+              </Text>
+              <Text style={[styles.tableCellRight, styles.col25, styles.tableCellBold]}>
+                {fmtCurrency(owner15YTotalNOI)}
+              </Text>
+            </View>
+            
+            <View style={styles.tableRow}>
+              <Text style={[styles.tableCell, styles.col25]}>Break-Even (15Y)</Text>
+              <Text style={[styles.tableCellRight, styles.col25, { color: '#059669', fontWeight: 'bold' }]}>
+                N/A (No investment)
+              </Text>
+              <Text style={[styles.tableCellRight, styles.col25]}>
+                {owner15YBEP !== null 
+                  ? (owner15YBEP < 12 ? `${owner15YBEP.toFixed(1)} months` : `${(owner15YBEP / 12).toFixed(1)} years`)
+                  : 'N/A'}
+              </Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Detailed Financial Analysis */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Detailed Financial Analysis</Text>
           
@@ -444,11 +603,13 @@ export const ProposalPdfDocument: React.FC<ProposalPdfDocumentProps> = ({
               
               <View style={styles.tableRow}>
                 <Text style={[styles.tableCell, styles.col25]}>Break-Even (months)</Text>
-                <Text style={[styles.tableCellRight, styles.col25]}>
-                  {(result10Y.paybackYears * 12).toFixed(1)}
+                <Text style={[styles.tableCellRight, styles.col25, { color: '#059669', fontWeight: 'bold' }]}>
+                  N/A
                 </Text>
-                <Text style={[styles.tableCellRight, styles.col25, styles.tableCellBold]}>
-                  {owner10YBEP.toFixed(1)}
+                <Text style={[styles.tableCellRight, styles.col25]}>
+                  {owner10YBEP !== null 
+                    ? owner10YBEP.toFixed(1)
+                    : 'N/A'}
                 </Text>
               </View>
             </View>
@@ -499,47 +660,51 @@ export const ProposalPdfDocument: React.FC<ProposalPdfDocumentProps> = ({
               
               <View style={styles.tableRow}>
                 <Text style={[styles.tableCell, styles.col25]}>Break-Even (months)</Text>
-                <Text style={[styles.tableCellRight, styles.col25]}>
-                  {(result15Y.paybackYears * 12).toFixed(1)}
+                <Text style={[styles.tableCellRight, styles.col25, { color: '#059669', fontWeight: 'bold' }]}>
+                  N/A
                 </Text>
-                <Text style={[styles.tableCellRight, styles.col25, styles.tableCellBold]}>
-                  {owner15YBEP.toFixed(1)}
+                <Text style={[styles.tableCellRight, styles.col25]}>
+                  {owner15YBEP !== null 
+                    ? owner15YBEP.toFixed(1)
+                    : 'N/A'}
                 </Text>
               </View>
             </View>
           </View>
         </View>
 
-        {/* Benefits Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Additional Benefits</Text>
-          <View style={styles.benefitsList}>
-            <View style={styles.benefitItem}>
-              <Text style={styles.benefitBullet}>•</Text>
-              <Text style={styles.benefitText}>
-                <Text style={{ fontWeight: 'bold' }}>No Operational Burden:</Text> EllumNet handles all installation, maintenance, customer support, and billing. You simply receive monthly revenue.
-              </Text>
-            </View>
-            <View style={styles.benefitItem}>
-              <Text style={styles.benefitBullet}>•</Text>
-              <Text style={styles.benefitText}>
-                <Text style={{ fontWeight: 'bold' }}>Property Value Enhancement:</Text> High-speed fiber infrastructure increases your property's market value and appeal to future buyers or investors.
-              </Text>
-            </View>
-            <View style={styles.benefitItem}>
-              <Text style={styles.benefitBullet}>•</Text>
-              <Text style={styles.benefitText}>
-                <Text style={{ fontWeight: 'bold' }}>Future-Proof Technology:</Text> Fiber infrastructure supports current and future bandwidth needs, ensuring your property remains competitive for years to come.
-              </Text>
-            </View>
-            <View style={styles.benefitItem}>
-              <Text style={styles.benefitBullet}>•</Text>
-              <Text style={styles.benefitText}>
-                <Text style={{ fontWeight: 'bold' }}>Professional Partnership:</Text> Work with an experienced team that has successfully deployed fiber to hundreds of properties, ensuring a smooth implementation.
-              </Text>
+        {/* Benefits Section - Only if includeFeatures is true */}
+        {includeFeatures && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Additional Benefits</Text>
+            <View style={styles.benefitsList}>
+              <View style={styles.benefitItem}>
+                <Text style={styles.benefitBullet}>•</Text>
+                <Text style={styles.benefitText}>
+                  <Text style={{ fontWeight: 'bold' }}>No Operational Burden:</Text> EllumNet handles all installation, maintenance, customer support, and billing. You simply receive monthly revenue.
+                </Text>
+              </View>
+              <View style={styles.benefitItem}>
+                <Text style={styles.benefitBullet}>•</Text>
+                <Text style={styles.benefitText}>
+                  <Text style={{ fontWeight: 'bold' }}>Property Value Enhancement:</Text> High-speed fiber infrastructure increases your property's market value and appeal to future buyers or investors.
+                </Text>
+              </View>
+              <View style={styles.benefitItem}>
+                <Text style={styles.benefitBullet}>•</Text>
+                <Text style={styles.benefitText}>
+                  <Text style={{ fontWeight: 'bold' }}>Future-Proof Technology:</Text> Fiber infrastructure supports current and future bandwidth needs, ensuring your property remains competitive for years to come.
+                </Text>
+              </View>
+              <View style={styles.benefitItem}>
+                <Text style={styles.benefitBullet}>•</Text>
+                <Text style={styles.benefitText}>
+                  <Text style={{ fontWeight: 'bold' }}>Professional Partnership:</Text> Work with an experienced team that has successfully deployed fiber to hundreds of properties, ensuring a smooth implementation.
+                </Text>
+              </View>
             </View>
           </View>
-        </View>
+        )}
 
         <View style={styles.footer}>
           <Text render={({ pageNumber, totalPages }) => `Page ${pageNumber} of ${totalPages} - Estimate only. Subject to site survey and contract.`} />

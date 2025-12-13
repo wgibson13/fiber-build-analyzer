@@ -5,10 +5,14 @@ import { analyzeBulkDeal } from '../engine/bulkAnalyzer';
 
 /**
  * Generate and download a PDF proposal
+ * @param input - Deal input parameters
+ * @param result - Analysis result
+ * @param includeFeatures - Whether to include features/benefits section (default: true)
  */
 export async function generateProposalPDF(
   input: BulkDealInput,
-  result: BulkDealResult
+  result: BulkDealResult,
+  includeFeatures: boolean = true
 ): Promise<void> {
   // Calculate scenarios for 10Y and 15Y terms
   const input10Y = { ...input, termYears: 10 };
@@ -42,6 +46,7 @@ export async function generateProposalPDF(
       result15Y={result15Y}
       result10YOwner={result10YOwner}
       result15YOwner={result15YOwner}
+      includeFeatures={includeFeatures}
     />
   );
   
@@ -49,7 +54,8 @@ export async function generateProposalPDF(
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
   link.href = url;
-  link.download = `${input.propertyName || 'Proposal'}_Bulk_Proposal_${new Date().toISOString().split('T')[0]}.pdf`;
+  const versionSuffix = includeFeatures ? '' : '_Financial_Only';
+  link.download = `${input.propertyName || 'Proposal'}_Bulk_Proposal${versionSuffix}_${new Date().toISOString().split('T')[0]}.pdf`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);

@@ -13,10 +13,10 @@ export function BulkAnalyzerResults({
   input,
   propertyName,
 }: BulkAnalyzerResultsProps) {
-  const handleGeneratePDF = async () => {
+  const handleGeneratePDF = async (includeFeatures: boolean = true) => {
     if (!result) return;
     try {
-      await generateProposalPDF(input, result);
+      await generateProposalPDF(input, result, includeFeatures);
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Error generating PDF. Please try again.');
@@ -40,17 +40,28 @@ export function BulkAnalyzerResults({
 
   return (
     <div className="bg-white rounded-xl shadow-md border border-gray-200 p-4 sm:p-6">
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-3">
         <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
           Results: {propertyName || 'Untitled Property'}
         </h2>
-        <button
-          onClick={handleGeneratePDF}
-          disabled={!result}
-          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
-        >
-          Download Proposal PDF
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => handleGeneratePDF(true)}
+            disabled={!result}
+            className="px-3 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-sm"
+            title="Includes features and benefits section"
+          >
+            Full PDF
+          </button>
+          <button
+            onClick={() => handleGeneratePDF(false)}
+            disabled={!result}
+            className="px-3 py-2 bg-gray-600 hover:bg-gray-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-gray-500 text-xs sm:text-sm"
+            title="Financial analysis only, no features section"
+          >
+            Financial Only
+          </button>
+        </div>
       </div>
 
       <div className="space-y-6">
